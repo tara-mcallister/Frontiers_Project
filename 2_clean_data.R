@@ -92,7 +92,7 @@ levels(data$condition)
 levels(data$prepost)
 
 #Add demographic info
-demog  = read.csv("BFS2_demog.csv")
+demog = read.table("BFS2_demog", sep=",", header=T)
 demog$subject <- as.factor(demog$subject)
 data <- left_join(data, demog, by="subject")
 data$subject <- as.factor(data$subject)
