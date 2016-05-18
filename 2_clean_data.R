@@ -38,8 +38,11 @@ data$sessiontype <- as.factor(substring(data$session,1,2))
 levels(data$sessiontype)
 
 #Create condition and prepost columns
-data$condition <- "NA"
-data$prepost <- "NA"
+#Previously these were all starting out as NA; info was filled in to the condition and prepost
+#columns for treatment sessions only (not probe sessions). However, the NAs were causing problems,
+#so now the default coding is "PROBE."
+data$condition <- "PROBE"
+data$prepost <- "PROBE"
 
 #Fill in condition and pre/post columns for TREATMENT DATA only
 dataBL <- droplevels(data[which(data$sessiontype=="BL"),])
@@ -84,7 +87,6 @@ dataTX$prepost <- recode(dataTX$prepost, c("'pre'='Pre'"))
 
 #Rebind all
 data <- rbind(dataBL, dataMP, dataMN, dataTX)
-
 data$session <- as.factor(data$session)
 data$condition <- as.factor(data$condition)
 data$prepost <- as.factor(data$prepost)
@@ -104,42 +106,6 @@ data$session = ordered(data$session, levels = c("BL1","BL2","BL3","BL4","BL5","T
                                                 "MP1","MP2","MP3","TX11","TX12",
                                                 "TX13","TX14","TX15","TX16","TX17","TX18","TX19","TX20","MN1","MN2","MN3"))   
 
-
-#Calculate average n of tokens per session
-str(data)
-levels(data$session)
-
-tab = plyr::count(data, c("subject","session","prepost"))
-tab <- as.data.frame(tab)
-BLMN <- tab[which(tab$prepost=="NA"),]
-PREPOST <- tab[which(tab$prepost!="NA"),]
-mBLMN <- mean(BLMN$freq)
-sdBLMN <- sd(BLMN$freq)
-mPREPOST <- mean(PREPOST$freq)
-sdPREPOST <- sd(PREPOST$freq)
-
-#Determine which words are BLMN only and which are shared BLMN/PREPOST
-length(levels(data$word))
-tab2 = as.data.frame(plyr::count(data,"word"))
-plot(tab2$freq)
-#items occurring over 300 times are shared BLMN/PREPOST
-#and the items occurring under 100 times are BLMN only.
-both <- droplevels(tab2[which(tab2$freq>300),])
-primary <- levels(both$word)
-only <- droplevels(tab2[which(tab2$freq<100),])
-generalization <- levels(only$word)
-
-#Option to consider only the primary words and exclude generalization words
-primarywords <- droplevels(data[which(data$word%in%primary),])
-head(primarywords)
-levels(primarywords$word)
-primarywords$word_type <- "primary"
-generalizationwords <- droplevels(data[which(data$word%in%generalization),])
-head(generalizationwords)
-levels(generalizationwords$word)
-generalizationwords$word_type <- "generalization"
-#Only uncomment this if you want to exclude generalization words
-#data <- primarywords
 
 #Save cleaned data
 write.csv(data, "clean_data.csv")
