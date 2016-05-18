@@ -83,7 +83,7 @@ dataTX$prepost <- recode(dataTX$prepost, c("'post'='Post'"))
 dataTX$prepost <- recode(dataTX$prepost, c("'pre'='Pre'"))
 
 #Rebind all
-data <- rbind(dataBL, dataMN, dataTX)
+data <- rbind(dataBL, dataMP, dataMN, dataTX)
 
 data$session <- as.factor(data$session)
 data$condition <- as.factor(data$condition)
@@ -92,7 +92,7 @@ levels(data$condition)
 levels(data$prepost)
 
 #Add demographic info
-demog = read.table("BFS2_demog", sep=",", header=T)
+demog = read.csv("BFS2_demog.csv")
 demog$subject <- as.factor(demog$subject)
 data <- left_join(data, demog, by="subject")
 data$subject <- as.factor(data$subject)
@@ -103,6 +103,7 @@ levels(data$session)
 data$session = ordered(data$session, levels = c("BL1","BL2","BL3","BL4","BL5","TX1","TX2","TX3","TX4","TX5","TX6","TX7","TX8","TX9","TX10",
                                                 "MP1","MP2","MP3","TX11","TX12",
                                                 "TX13","TX14","TX15","TX16","TX17","TX18","TX19","TX20","MN1","MN2","MN3"))   
+
 
 #Calculate average n of tokens per session
 str(data)
