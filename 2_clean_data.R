@@ -140,3 +140,6 @@ levels(generalizationwords$word)
 generalizationwords$word_type <- "generalization"
 #Only uncomment this if you want to exclude generalization words
 #data <- primarywords
+
+#Save cleaned data
+write.csv(data, "clean_data.csv")
