@@ -56,7 +56,7 @@ Children <- levels(data$subject)
 for (i in seq_along(Children)){
   
   
-  child <- data[data$subject==Children[i],]
+  child <- droplevels(data[data$subject==Children[i],])
   #child <- data[data$subject=="Liam",] 
   numerical=c(1:length(levels(child$session)))
   minus <- length(numerical) - 2
@@ -100,9 +100,9 @@ for (i in seq_along(Children)){
   color <- rgb(190, 190, 190, alpha=80, maxColorValue=255)
   rect(xleft=0.0, xright=endBL, ybottom=0,ytop=100, density=100, 
        col=color)
-  rect(xleft=15.5, xright=18.5, ybottom=0,ytop=100, density=100, 
+  rect(xleft=beginMP, xright=endMP, ybottom=0,ytop=100, density=100, 
        col=color)
-  rect(xleft=28.5, xright=32, ybottom=0,ytop=100, density=100, 
+  rect(xleft=beginMN, xright=endMN, ybottom=0,ytop=100, density=100, 
        col=color)
   
   #Plot TRAD
