@@ -131,6 +131,8 @@ for (i in seq_along(Children)){
 
 #*write missing ratings to a data frame*
 write.csv(missing, "missing.csv")
+row.names(missing) <- NULL
+missing[c("subject", "session", "word")]
 
 myy <- rep(-8,times=length(numerical))
 plot(y=myy, x=numerical, xaxt="n", yaxt="n",
