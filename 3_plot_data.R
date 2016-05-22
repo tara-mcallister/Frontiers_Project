@@ -93,6 +93,13 @@ for (i in seq_along(Children)){
        xaxt="n", xlab = "Session", ylab = "Mean rating", ylim = c(0, 100))
   axis(1, at=numerical, labels=labels, cex.axis = 1.25)
   
+  #*Place a legend based on mean rating of MN sessions*
+  ifelse(mean(rev(BF_pre_percent)[1:3]) <= 50, 
+         legend("topright",cex=.9, legend = c("Pre BF", "Post BF","Pre Trad", "Post Trad"), 
+            pch = c(1,1,12,6), col=c("black","red", "blue","green")), 
+         legend("bottomright" ,cex=.9, legend = c("Pre BF", "Post BF","Pre Trad", "Post Trad"), 
+            pch = c(1,1,12,6), col=c("black","red", "blue","green")))
+  
   points(numerical+.2, BF_post_percent,  pch = 8, col = "red", lty=2) 
   
   #Set points for shading BL, MP, and MN regions
