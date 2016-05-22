@@ -52,16 +52,20 @@ par(xpd=FALSE)
 #Loop through participants
 Children <- levels(data$subject)
 
+#*creates empty vector to add in missing data*
+missing <- c()
 
 for (i in seq_along(Children)){
   
-  
   child <- droplevels(data[data$subject==Children[i],])
-  #child <- data[data$subject=="Liam",] 
+  #child <- data[data$subject=="Emily",] 
   numerical=c(1:length(levels(child$session)))
   minus <- length(numerical) - 2
   labels = levels(child$session)
   label = unique(child$subject)
+  
+  #*adds missing data for each child to a data frame*
+  missing <- rbind(missing, droplevels(child[which(is.na(child$mean)),]))
   
   BL <- droplevels(subset(child, sessiontype=="BL"))
   nbl <- length(levels(BL$session))
@@ -90,7 +94,7 @@ for (i in seq_along(Children)){
   axis(1, at=numerical, labels=labels, cex.axis = 1.25)
   
   points(numerical+.2, BF_post_percent,  pch = 8, col = "red", lty=2) 
-
+  
   #Set points for shading BL, MP, and MN regions
   endBL <- nbl + .5
   beginMP <- endBL + 10
@@ -123,9 +127,10 @@ for (i in seq_along(Children)){
   points(numerical, TRAD_pre_percent,  pch = 12, col = "blue", lty=2) 
   points(numerical+.2, TRAD_post_percent,  pch = 6, col = "green", lty=2) 
   
-
-  
 }
+
+#*write missing ratings to a data frame*
+write.csv(missing, "missing.csv")
 
 myy <- rep(-8,times=length(numerical))
 plot(y=myy, x=numerical, xaxt="n", yaxt="n",
