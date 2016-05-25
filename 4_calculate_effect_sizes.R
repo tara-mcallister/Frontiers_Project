@@ -220,5 +220,4 @@ str(data3)
 data3$BF_advantage <- data3$ES_BF - data3$ES_TRAD
 data3
 
-
 write.csv(data3, "cohort2_EF_data.csv")
