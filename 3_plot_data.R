@@ -137,14 +137,7 @@ for (i in seq_along(Children)){
 }
 
 #*write missing ratings to a data frame*
-write.csv(missing, "missing.csv")
+#write.csv(missing, "missing.csv")
 row.names(missing) <- NULL
 missing[c("subject", "session", "word")]
-
-myy <- rep(-8,times=length(numerical))
-plot(y=myy, x=numerical, xaxt="n", yaxt="n",
-     main = "Legend", ylim = c(0, 100))
-#Add a legend
-legend(15,105,cex=1.25, legend = c("Pre", "Post","Pre", "Post"), 
-       pch = c(1,1,12,6), col=c("black","red", "blue","green"))
 
