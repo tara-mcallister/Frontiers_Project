@@ -143,15 +143,39 @@ for (i in seq_along(Children)){
 }
 
 #Effect size 1: BL to MP
-pooled1 <- sqrt(((nbl-1)*(bl1_sd^2) + (nmp-1)*(mp1_sd^2))/(nbl+nmp-2))
+pooled1a <- sqrt(((nbl-1)*(bl1_sd^2) + (nmp-1)*(mp1_sd^2))/(nbl+nmp-2))
+
+pooled1 <- ((nbl-1)*(bl1_sd^2)) %>%
+  add((nmp-1)*(mp1_sd^2)) %>%
+  divide_by(nbl+nmp-2) %>%
+  raise_to_power(1/2)
+
+pooled1a==pooled1
+
 ES1 <- (mp1_m - bl1_m)/pooled1
 
 #Effect size 2: MP to MN
-pooled2 <- sqrt(((nmp-1)*(mp1_sd^2) + (nmn-1)*(mn1_sd^2))/(nbl+nmn-2))
+pooled2a <- sqrt(((nmp-1)*(mp1_sd^2) + (nmn-1)*(mn1_sd^2))/(nmp+nmn-2))
+
+pooled2 <- ((nmp-1)*(mp1_sd^2)) %>%
+  add((nmn-1)*(mn1_sd^2)) %>%
+  divide_by(nmp+nmn-2) %>%
+  raise_to_power(1/2)
+
+pooled2a==pooled2
+
 ES2 <- (mn1_m - mp1_m)/pooled2
 
 #Effect size 3: BL to MN
-pooled3 <- sqrt(((nbl-1)*(bl1_sd^2) + (nmn-1)*(mn1_sd^2))/(nbl+nmn-2))
+pooled3a <- sqrt(((nbl-1)*(bl1_sd^2) + (nmn-1)*(mn1_sd^2))/(nbl+nmn-2))
+
+pooled3 <- ((nbl-1)*(bl1_sd^2)) %>%
+  add((nmn-1)*(mn1_sd^2)) %>%
+  divide_by(nbl+nmn-2) %>%
+  raise_to_power(1/2)
+
+pooled3a==pooled3
+
 ES3 <- (mn1_m - bl1_m)/pooled2
 
 
@@ -195,6 +219,5 @@ str(data3)
 #Diff in effect size
 data3$BF_advantage <- data3$ES_BF - data3$ES_TRAD
 data3
-
 
 write.csv(data3, "cohort2_EF_data.csv")
