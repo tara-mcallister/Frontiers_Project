@@ -64,11 +64,16 @@ for (i in seq_along(Children)){
   labels = levels(child$session)
   label = unique(child$subject)
   
-  #*adds missing data for each child to a data frame*
+   #*adds missing data for each child to a data frame*
   missing <- rbind(missing, droplevels(child[which(is.na(child$mean)),]))
   
   BL <- droplevels(subset(child, sessiontype=="BL"))
   nbl <- length(levels(BL$session))
+  
+  bl1_sum <- tapply(BL$correct, BL$session, sum, na.rm=TRUE)
+  bl1_total <- tapply(BL$total, BL$session, sum, na.rm=TRUE)
+  bl1_perc <- bl1_sum*100/bl1_total
+  bl1_m <- mean(bl1_perc)
   
   #Plot Treated Targets
   ###NB name "BF" here is a holdover from cohort 1--
@@ -92,6 +97,8 @@ for (i in seq_along(Children)){
        main = label,
        xaxt="n", xlab = "Session", ylab = "Mean rating", ylim = c(0, 100))
   axis(1, at=numerical, labels=labels, cex.axis = 1.25)
+  #Plot baseline mean
+  yline(bl1_m, lty=2)
   
   #*Place a legend based on mean rating of MN sessions*
   ifelse(mean(rev(BF_pre_percent)[1:3]) <= 50, 
@@ -133,18 +140,12 @@ for (i in seq_along(Children)){
   #Plot points
   points(numerical, TRAD_pre_percent,  pch = 12, col = "blue", lty=2) 
   points(numerical+.2, TRAD_post_percent,  pch = 6, col = "green", lty=2) 
+
   
 }
 
 #*write missing ratings to a data frame*
-write.csv(missing, "missing.csv")
+#write.csv(missing, "missing.csv")
 row.names(missing) <- NULL
 missing[c("subject", "session", "word")]
-
-myy <- rep(-8,times=length(numerical))
-plot(y=myy, x=numerical, xaxt="n", yaxt="n",
-     main = "Legend", ylim = c(0, 100))
-#Add a legend
-legend(15,105,cex=1.25, legend = c("Pre", "Post","Pre", "Post"), 
-       pch = c(1,1,12,6), col=c("black","red", "blue","green"))
 

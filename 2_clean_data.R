@@ -11,6 +11,7 @@ data  = read.csv("BFS2_trials_summarized", sep="\t", header=T)
 str(data)
 #data$X.1 <- NULL
 dim(data)
+which(is.na(data$mean))
 
 #Subject as factor
 data$subject <- as.factor(data$subject)
