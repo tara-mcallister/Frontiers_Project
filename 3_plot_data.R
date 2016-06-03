@@ -109,11 +109,11 @@ for (i in seq_along(Children)){
   beginMN <- endMP + 10
   endMN <- beginMN + 3
   color <- rgb(190, 190, 190, alpha=80, maxColorValue=255)
-  rect(xleft=0.0, xright=endBL, ybottom=0,ytop=100, density=100, 
+  rect(xleft=0.0-1, xright=endBL, ybottom=-4, ytop=106, density=100, 
        col=color)
-  rect(xleft=beginMP, xright=endMP, ybottom=0,ytop=100, density=100, 
+  rect(xleft=beginMP, xright=endMP, ybottom=-4, ytop=106, density=100, 
        col=color)
-  rect(xleft=beginMN, xright=endMN, ybottom=0,ytop=100, density=100, 
+  rect(xleft=beginMN, xright=endMN, ybottom=-4, ytop=106, density=100, 
        col=color)
   
   #Plot TRAD
