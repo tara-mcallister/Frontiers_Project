@@ -24,7 +24,7 @@ data$session = ordered(data$session, levels = c("BL1","BL2","BL3","BL4","BL5","T
     #Determine which words are BLMN only and which are shared BLMN/PREPOST
     length(levels(data$word))
     tab2 = as.data.frame(plyr::count(data,"word"))
-    plot(tab2$freq)
+  #  plot(tab2$freq)
     #items occurring over 300 times are shared BLMN/PREPOST
     #and the items occurring under 100 times are BLMN only.
     both <- droplevels(tab2[which(tab2$freq>300),])
@@ -100,13 +100,6 @@ for (i in seq_along(Children)){
   #Plot baseline mean
   yline(bl1_m, lty=2)
   
-  #*Place a legend based on mean rating of MN sessions*
-  ifelse(mean(rev(BF_pre_percent)[1:3]) <= 50, 
-         legend("topright",cex=.9, legend = c("Pre BF", "Post BF","Pre Trad", "Post Trad"), 
-            pch = c(1,1,12,6), col=c("black","red", "blue","green")), 
-         legend("bottomright" ,cex=.9, legend = c("Pre BF", "Post BF","Pre Trad", "Post Trad"), 
-            pch = c(1,1,12,6), col=c("black","red", "blue","green")))
-  
   points(numerical+.2, BF_post_percent,  pch = 8, col = "red", lty=2) 
   
   #Set points for shading BL, MP, and MN regions
@@ -116,11 +109,11 @@ for (i in seq_along(Children)){
   beginMN <- endMP + 10
   endMN <- beginMN + 3
   color <- rgb(190, 190, 190, alpha=80, maxColorValue=255)
-  rect(xleft=0.0, xright=endBL, ybottom=0,ytop=100, density=100, 
+  rect(xleft=0.0-1, xright=endBL, ybottom=-4, ytop=106, density=100, 
        col=color)
-  rect(xleft=beginMP, xright=endMP, ybottom=0,ytop=100, density=100, 
+  rect(xleft=beginMP, xright=endMP, ybottom=-4, ytop=106, density=100, 
        col=color)
-  rect(xleft=beginMN, xright=endMN, ybottom=0,ytop=100, density=100, 
+  rect(xleft=beginMN, xright=endMN, ybottom=-4, ytop=106, density=100, 
        col=color)
   
   #Plot TRAD
@@ -141,6 +134,12 @@ for (i in seq_along(Children)){
   points(numerical, TRAD_pre_percent,  pch = 12, col = "blue", lty=2) 
   points(numerical+.2, TRAD_post_percent,  pch = 6, col = "green", lty=2) 
 
+  #*Place a legend based on mean rating of MN sessions*
+  ifelse(mean(rev(BF_pre_percent)[1:3]) <= 50, 
+         legend("topright",cex=.9, legend = c("Pre BF", "Post BF","Pre Trad", "Post Trad"), 
+                pch = c(1,1,12,6), col=c("black","red", "blue","green"), bg = "white"), 
+         legend("bottomright" ,cex=.9, legend = c("Pre BF", "Post BF","Pre Trad", "Post Trad"), 
+                pch = c(1,1,12,6), col=c("black","red", "blue","green"), bg = "white"))
   
 }
 
