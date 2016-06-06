@@ -6,6 +6,7 @@ library(fields)
 library(car)
 library(reshape2)
 library(plyr)
+library(magrittr)
 
 #Read in data
 data <- read.csv("clean_data.csv")
@@ -152,7 +153,7 @@ pooled1 <- ((nbl-1)*(bl1_sd^2)) %>%
 
 pooled1a==pooled1
 
-ES1 <- (mp1_m - bl1_m)/pooled1
+ESPhase1 <- (mp1_m - bl1_m)/pooled1
 
 #Effect size 2: MP to MN
 pooled2a <- sqrt(((nmp-1)*(mp1_sd^2) + (nmn-1)*(mn1_sd^2))/(nmp+nmn-2))
@@ -164,7 +165,7 @@ pooled2 <- ((nmp-1)*(mp1_sd^2)) %>%
 
 pooled2a==pooled2
 
-ES2 <- (mn1_m - mp1_m)/pooled2
+ESPhase2 <- (mn1_m - mp1_m)/pooled2
 
 #Effect size 3: BL to MN
 pooled3a <- sqrt(((nbl-1)*(bl1_sd^2) + (nmn-1)*(mn1_sd^2))/(nbl+nmn-2))
@@ -176,7 +177,7 @@ pooled3 <- ((nbl-1)*(bl1_sd^2)) %>%
 
 pooled3a==pooled3
 
-ES3 <- (mn1_m - bl1_m)/pooled2
+ESall <- (mn1_m - bl1_m)/pooled2
 
 
 bl1_m <- round(bl1_m, digits=2)
@@ -186,14 +187,15 @@ mp1_sd <- round(mp1_sd, digits=2)
 mn1_m <- round(mn1_m, digits=2)
 mn1_sd <- round(mn1_sd, digits=2)
 pooled1 <- round(pooled1, digits=2)
-ES1 <- round(ES1, digits=2)
+ESPhase1 <- round(ESPhase1, digits=2)
 pooled2 <- round(pooled2, digits=2)
-ES2 <- round(ES2, digits=2)
+ESPhase2 <- round(ESPhase2, digits=2)
 pooled3 <- round(pooled3, digits=2)
-ES3 <- round(ES3, digits=2)
+ESall <- round(ESall, digits=2)
 
-data1 <- as.data.frame(cbind(Children, bl1_m, bl1_sd,mp1_m, mp1_sd, mn1_m, mn1_sd, pooled1, ES1, pooled2, ES2, pooled3, ES3))
+data1 <- data.frame(Children, bl1_m, bl1_sd,mp1_m, mp1_sd, mn1_m, mn1_sd, pooled1, ESPhase1, pooled2, ESPhase2, pooled3, ESall)
 colnames(data1)[1] <- "subject" 
+str(data1)
 
 #Add demographic info
 demog  = read.csv("BFS2_demog.csv", header=T)
@@ -204,20 +206,60 @@ str(data2)
 
 #Code by treatment type
 TRAD1 <- droplevels(subset(data2, tx_order=="TRAD_BF"))
-TRAD1$ES_TRAD <- TRAD1$ES1
-TRAD1$ES_BF <- TRAD1$ES2
+TRAD1$ES_TRAD <- TRAD1$ESPhase1
+TRAD1$ES_BF <- TRAD1$ESPhase2
 
 BF1 <- droplevels(subset(data2, tx_order=="BF_TRAD"))
-BF1$ES_TRAD <- BF1$ES2
-BF1$ES_BF <- BF1$ES1
+BF1$ES_TRAD <- BF1$ESPhase2
+BF1$ES_BF <- BF1$ESPhase1
 
 data3 <- rbind(TRAD1, BF1) 
-data3$ES_TRAD <- as.numeric(as.character(data3$ES_TRAD))
-data3$ES_BF <- as.numeric(as.character(data3$ES_BF))
-str(data3)
 
-#Diff in effect size
+#Diff in effect size between BF and TRAD conditions
+#Putting BF first because hypothesized to have larger effect
 data3$BF_advantage <- data3$ES_BF - data3$ES_TRAD
-data3
 
+#Diff in effect size between first and second phases
+#Putting Phase 2 first because hypothesized to show cumulative effect
+data3$order_effect <- data3$ESPhase2 - data3$ESPhase1
+
+#Write all data to file
 write.csv(data3, "cohort2_EF_data.csv")
+
+#Mean effect size across all participants for trad phase and BF phase
+tradmeanES <- mean(data3$ES_TRAD)
+BFmeanES <- mean(data3$ES_BF)
+
+#Mean difference between BF and TRAD
+#Small BF advantage, but lots of variability (large SD)
+meanBFadvantage <- mean(data3$BF_advantage) 
+sdBFadvantage <- sd(data3$BF_advantage) 
+
+#Mean diff between phase 1 and phase 2 
+#Generally a larger effect in phase 1 than phase 2, unexpectedly
+#Note large SD
+meanorder <- mean(data3$order_effect)
+sdorder <- sd(data3$order_effect)
+
+#Does the comparison of phase 1 vs phase 2 look different in BF-first vs TRAD-first?
+TRAD1 <- droplevels(subset(data3, tx_order=="TRAD_BF"))
+mean(TRAD1$order_effect)
+sd(TRAD1$order_effect)
+
+BF1 <- droplevels(subset(data3, tx_order=="BF_TRAD"))
+mean(BF1$order_effect)
+sd(BF1$order_effect)
+
+#Both groups show larger generalization gains in phase 1 than phase 2
+#But the difference is greater (advantage for phase 1 is greater) for BF-first group
+#Note that this is not in keeping with the prediction that BF is better for acquisition 
+#and TRAD is better for generalization
+
+#Does overal effect size look different in BF-first vs TRAD-first?
+mean(TRAD1$ESall)
+sd(TRAD1$ESall)
+
+mean(BF1$ESall)
+sd(BF1$ESall)
+#Large absolute difference, but extremely variable across participants; not significant
+t.test(TRAD1$ESall, BF1$ESall)
