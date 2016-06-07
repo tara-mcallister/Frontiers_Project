@@ -19,12 +19,15 @@ data$session = ordered(data$session, levels = c("BL1","BL2","BL3","BL4","BL5","T
 
 
 #This code creates an option to plot only the primary words and exclude generalization words
+#Note how these categories are defined: primary means probed in BLMN and PREPOST,
+#"generalization" means probed in BLMN only. 
+#All are untreated (i.e. not words used as targets during treatment)
 #You can ignore it if you are including all words
 
     #Determine which words are BLMN only and which are shared BLMN/PREPOST
     length(levels(data$word))
     tab2 = as.data.frame(plyr::count(data,"word"))
-    plot(tab2$freq)
+  #  plot(tab2$freq)
     #items occurring over 300 times are shared BLMN/PREPOST
     #and the items occurring under 100 times are BLMN only.
     both <- droplevels(tab2[which(tab2$freq>300),])
