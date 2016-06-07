@@ -80,7 +80,6 @@ TX[which(TX$session<="TX10"),]$phase <- "1"
 TX[which(TX$session>"TX10"),]$phase <- "2"
 #TX$unique <- paste0(TX$subject,"_",TX$phase)
 
-
 #Summarize by phase
 TX <- TX %>%
   dplyr::group_by(subject, phase, condition) %>%
@@ -96,6 +95,8 @@ sd(phase1$mean)
 mean(phase2$mean)
 sd(phase2$mean)
 t.test(phase1$mean, phase2$mean)
+#should this be non-parametric?
+wilcox.test(phase1$mean, phase2$mean)
 #NS
 
 #Compare mean within-session change for Trad phase vs BF phase 
@@ -107,10 +108,14 @@ mean(BF$mean)
 sd(BF$mean)
 #Mean is larger for BF than Trad, but highly variable; nonsignificant
 t.test(BF$mean, Trad$mean)
+#should this be non-parametric?
+t.test(BF$mean, Trad$mean)
 #NS
 
-#I don't know why this boxplot isn't working
+#I don't know why this boxplot isn't working -- **IS THIS WHAT YOU WERE INTENDING?
 #qplot(TX$mean, fill = TX$condition, geom="boxplot")
+qplot(condition, mean, data=TX, geom="boxplot", fill = condition, main="Mean Difference by Condition",
+      xlab="Treatment Condition", ylab="Mean Difference in % accuracy post-pre")
 
 #Compare Trad vs BF means in a within-subject fashion
 TX$phase <- NULL
