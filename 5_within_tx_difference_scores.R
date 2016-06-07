@@ -13,11 +13,16 @@ library(ggplot2)
 
 #Read in data
 data <- read.csv("clean_data.csv")
+dim(data)
 #Check that variables are of correct types
 str(data)
 data$subject_number <- as.factor(data$subject_number)
 
-#Consider only treatment session data
+
+#This code creates an option to plot only the primary words and exclude generalization words
+#You can ignore it if you are including all words
+
+#For within-session, consider only treatment session data
 TX <- droplevels(subset(data, sessiontype=="TX"))
 ntx <- length(levels(TX$session))
 
@@ -25,6 +30,8 @@ ntx <- length(levels(TX$session))
 TX$session = ordered(TX$session, levels = c("TX1","TX2","TX3","TX4","TX5","TX6","TX7","TX8","TX9","TX10",
                                             "TX11","TX12","TX13","TX14","TX15","TX16","TX17","TX18","TX19","TX20"))   
 TX$prepost = ordered(TX$prepost, levels= c("Pre","Post"))
+
+
 
 #Summarize by subject, session, prepost
 #Include condition (BF vs TRAD) and tx_order as grouping factors
@@ -71,12 +78,12 @@ str(TX)
 TX$phase <- 0
 TX[which(TX$session<="TX10"),]$phase <- "1"
 TX[which(TX$session>"TX10"),]$phase <- "2"
-TX$unique <- paste0(TX$subject,"_",TX$phase)
+#TX$unique <- paste0(TX$subject,"_",TX$phase)
 
 
 #Summarize by phase
 TX <- TX %>%
-  dplyr::group_by(subject, phase, condition, unique) %>%
+  dplyr::group_by(subject, phase, condition) %>%
     dplyr::summarise(mean=mean(diff))
 
 TX <- as.data.frame(TX)
@@ -91,7 +98,6 @@ sd(phase2$mean)
 t.test(phase1$mean, phase2$mean)
 #NS
 
-
 #Compare mean within-session change for Trad phase vs BF phase 
 Trad <- droplevels(TX[TX$condition=="Trad",])
 BF <- droplevels(TX[TX$condition=="BF",])
@@ -102,6 +108,7 @@ sd(BF$mean)
 #Mean is larger for BF than Trad, but highly variable; nonsignificant
 t.test(BF$mean, Trad$mean)
 #NS
+
 #I don't know why this boxplot isn't working
 #qplot(TX$mean, fill = TX$condition, geom="boxplot")
 
