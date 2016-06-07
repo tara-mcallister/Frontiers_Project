@@ -122,6 +122,8 @@ TX$phase <- NULL
 TX <- TX %>% 
   spread(condition, mean)
 t.test(TX$BF, TX$Trad, paired=TRUE)
+#should this be non-parametric?
+wilcox.test(BF$mean, Trad$mean)
 #Still definitely NS
 
 
