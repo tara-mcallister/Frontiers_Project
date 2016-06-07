@@ -19,31 +19,34 @@ data$session = ordered(data$session, levels = c("BL1","BL2","BL3","BL4","BL5","T
                                                 "TX13","TX14","TX15","TX16","TX17","TX18","TX19","TX20","MN1","MN2","MN3"))   
 
 
-#This code creates an option to plot only the primary words and exclude generalization words
-#You can ignore it if you are including all words
-
+#This code creates an option to examine only the primary probe words 
+#and exclude less frequently occurring generalization items
+#Note how these categories are defined: primary means probed in BLMN and PREPOST,
+#"generalization" means probed in BLMN only. 
+#All are untreated (i.e. not words used as targets during treatment)
 #Determine which words are BLMN only and which are shared BLMN/PREPOST
-length(levels(data$word))
-tab2 = as.data.frame(plyr::count(data,"word"))
-plot(tab2$freq)
-#items occurring over 300 times are shared BLMN/PREPOST
-#and the items occurring under 100 times are BLMN only.
-both <- droplevels(tab2[which(tab2$freq>300),])
-primary <- levels(both$word)
-only <- droplevels(tab2[which(tab2$freq<100),])
-generalization <- levels(only$word)
+    length(levels(data$word))
+    tab2 = as.data.frame(plyr::count(data,"word"))
+    #plot(tab2$freq)
+    #items occurring over 300 times are shared BLMN/PREPOST
+    #and the items occurring under 200 times are BLMN only
+    both <- droplevels(tab2[which(tab2$freq>300),])
+    primary <- levels(both$word)
+    only <- droplevels(tab2[which(tab2$freq<200),])
+    generalization <- levels(only$word)
 
 #Option to reduce to only primary words
-primarywords <- droplevels(data[which(data$word%in%primary),])
-head(primarywords)
-levels(primarywords$word)
-primarywords$word_type <- "primary"
-generalizationwords <- droplevels(data[which(data$word%in%generalization),])
-head(generalizationwords)
-levels(generalizationwords$word)
-generalizationwords$word_type <- "generalization"
-#Only uncomment this if you want to exclude generalization words
-#data <- primarywords
+#You can ignore it if you are including all words
+    primarywords <- droplevels(data[which(data$word%in%primary),])
+    head(primarywords)
+    levels(primarywords$word)
+    primarywords$word_type <- "primary"
+    generalizationwords <- droplevels(data[which(data$word%in%generalization),])
+    head(generalizationwords)
+    levels(generalizationwords$word)
+    generalizationwords$word_type <- "generalization"
+    #Only uncomment this if you want to exclude generalization words
+    #data <- primarywords
 
 #Calculate average n of tokens per session
 str(data)
@@ -57,29 +60,6 @@ mBLMN <- mean(BLMN$freq)
 sdBLMN <- sd(BLMN$freq)
 mPREPOST <- mean(PREPOST$freq)
 sdPREPOST <- sd(PREPOST$freq)
-
-#Determine which words are BLMN only and which are shared BLMN/PREPOST
-length(levels(data$word))
-tab2 = as.data.frame(plyr::count(data,"word"))
-plot(tab2$freq)
-#items occurring over 300 times are shared BLMN/PREPOST
-#and the items occurring under 100 times are BLMN only.
-both <- droplevels(tab2[which(tab2$freq>300),])
-primary <- levels(both$word)
-only <- droplevels(tab2[which(tab2$freq<100),])
-generalization <- levels(only$word)
-
-#Option to plot only the primary words and exclude generalization words
-primarywords <- droplevels(data[which(data$word%in%primary),])
-head(primarywords)
-levels(primarywords$word)
-primarywords$word_type <- "primary"
-generalizationwords <- droplevels(data[which(data$word%in%generalization),])
-head(generalizationwords)
-levels(generalizationwords$word)
-generalizationwords$word_type <- "generalization"
-#Only uncomment this if you want to exclude generalization words
-#data <- primarywords
 
 tx1 <- data
 str(tx1)
@@ -223,8 +203,12 @@ data3$BF_advantage <- data3$ES_BF - data3$ES_TRAD
 #Putting Phase 2 first because hypothesized to show cumulative effect
 data3$order_effect <- data3$ESPhase2 - data3$ESPhase1
 
-#Write all data to file
-write.csv(data3, "cohort2_EF_data.csv")
+######################################################
+######################################################
+#Write complete data table to file
+#write.csv(data3, "cohort2_EF_data.csv")
+#######################################################
+######################################################
 
 #Mean effect size across all participants for trad phase and BF phase
 tradmeanES <- mean(data3$ES_TRAD)
@@ -243,12 +227,12 @@ sdorder <- sd(data3$order_effect)
 
 #Does the comparison of phase 1 vs phase 2 look different in BF-first vs TRAD-first?
 TRAD1 <- droplevels(subset(data3, tx_order=="TRAD_BF"))
-mean(TRAD1$order_effect)
-sd(TRAD1$order_effect)
+meanTRADorder <- mean(TRAD1$order_effect)
+sdTRADorder <- sd(TRAD1$order_effect)
 
 BF1 <- droplevels(subset(data3, tx_order=="BF_TRAD"))
-mean(BF1$order_effect)
-sd(BF1$order_effect)
+meanBForder <- mean(BF1$order_effect)
+sdBForder <- sd(BF1$order_effect)
 
 #Both groups show larger generalization gains in phase 1 than phase 2
 #But the difference is greater (advantage for phase 1 is greater) for BF-first group
@@ -256,10 +240,10 @@ sd(BF1$order_effect)
 #and TRAD is better for generalization
 
 #Does overal effect size look different in BF-first vs TRAD-first?
-mean(TRAD1$ESall)
-sd(TRAD1$ESall)
+meanTRADfirst <- mean(TRAD1$ESall)
+sdTRADfirst <- sd(TRAD1$ESall)
 
-mean(BF1$ESall)
-sd(BF1$ESall)
+meanBFfirst <- mean(BF1$ESall)
+sdBFfirst <-sd(BF1$ESall)
 #Large absolute difference, but extremely variable across participants; not significant
 t.test(TRAD1$ESall, BF1$ESall)
