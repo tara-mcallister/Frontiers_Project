@@ -118,7 +118,7 @@ TX <- TX %>%
   spread(condition, mean)
 t.test(TX$BF, TX$Trad, paired=TRUE)
 #Still definitely NS
-
+TX$BFmean_TRADmean <- TX$BF - TX$Trad
 
 
 
