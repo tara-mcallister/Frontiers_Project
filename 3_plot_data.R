@@ -19,6 +19,9 @@ data$session = ordered(data$session, levels = c("BL1","BL2","BL3","BL4","BL5","T
 
 
 #This code creates an option to plot only the primary words and exclude generalization words
+#Note how these categories are defined: primary means probed in BLMN and PREPOST,
+#"generalization" means probed in BLMN only. 
+#All are untreated (i.e. not words used as targets during treatment)
 #You can ignore it if you are including all words
 
     #Determine which words are BLMN only and which are shared BLMN/PREPOST
