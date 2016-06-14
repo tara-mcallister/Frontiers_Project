@@ -1,6 +1,6 @@
 ---
 title: "Frontiers paper"
-author: "Tara McAllister Byun"
+author: "Tara McAllister Byun and Heather Campbell"
 date: "June 6, 2016"
 geometry: margin=2.54cm
 output: word_document
@@ -156,7 +156,7 @@ data$session = ordered(data$session, levels = c("BL1","BL2","BL3","BL4","BL5","T
 #################################################################
 data <- read.csv("clean_data.csv")
 #Check that variables are of correct types
-str(data)
+#str(data)
 data$subject_number <- as.factor(data$subject_number)
 #Need to re-set ordered factors
 data$session = ordered(data$session, levels = c("BL1","BL2","BL3","BL4","BL5","TX1","TX2","TX3","TX4","TX5","TX6","TX7","TX8","TX9","TX10",
@@ -170,8 +170,8 @@ data$session = ordered(data$session, levels = c("BL1","BL2","BL3","BL4","BL5","T
 #"generalization" means probed in BLMN only. 
 #All are untreated (i.e. not words used as targets during treatment)
 #Determine which words are BLMN only and which are shared BLMN/PREPOST
-    length(levels(data$word))
-    tab2 = as.data.frame(plyr::count(data,"word"))
+  #  length(levels(data$word))
+   tab2 = as.data.frame(plyr::count(data,"word"))
     #plot(tab2$freq)
     #items occurring over 300 times are shared BLMN/PREPOST
     #and the items occurring under 200 times are BLMN only
@@ -183,22 +183,22 @@ data$session = ordered(data$session, levels = c("BL1","BL2","BL3","BL4","BL5","T
 #Option to reduce to only primary words
 #You can ignore it if you are including all words
     primarywords <- droplevels(data[which(data$word%in%primary),])
-    head(primarywords)
-    levels(primarywords$word)
+  #  head(primarywords)
+  #  levels(primarywords$word)
     primarywords$word_type <- "primary"
     generalizationwords <- droplevels(data[which(data$word%in%generalization),])
-    head(generalizationwords)
-    levels(generalizationwords$word)
+  #  head(generalizationwords)
+  #  levels(generalizationwords$word)
     generalizationwords$word_type <- "generalization"
     #Only uncomment this if you want to exclude generalization words
     #data <- primarywords
 
 #Calculate average n of tokens per session
-str(data)
-levels(data$session)
+#str(data)
+#levels(data$session)
 
 tab = plyr::count(data, c("subject","session","prepost"))
-tab <- as.data.frame(tab)
+#tab <- as.data.frame(tab)
 BLMN <- tab[which(tab$prepost=="NA"),]
 PREPOST <- tab[which(tab$prepost!="NA"),]
 mBLMN <- mean(BLMN$freq)
@@ -207,7 +207,7 @@ mPREPOST <- mean(PREPOST$freq)
 sdPREPOST <- sd(PREPOST$freq)
 
 tx1 <- data
-str(tx1)
+#str(tx1)
 Children <- levels(tx1$subject)
 
 #True baseline points
@@ -276,7 +276,7 @@ pooled1 <- ((nbl-1)*(bl1_sd^2)) %>%
   divide_by(nbl+nmp-2) %>%
   raise_to_power(1/2)
 
-pooled1a==pooled1
+#pooled1a==pooled1
 
 ESPhase1 <- (mp1_m - bl1_m)/pooled1
 
@@ -288,7 +288,7 @@ pooled2 <- ((nmp-1)*(mp1_sd^2)) %>%
   divide_by(nmp+nmn-2) %>%
   raise_to_power(1/2)
 
-pooled2a==pooled2
+#pooled2a==pooled2
 
 ESPhase2 <- (mn1_m - mp1_m)/pooled2
 
@@ -300,7 +300,7 @@ pooled3 <- ((nbl-1)*(bl1_sd^2)) %>%
   divide_by(nbl+nmn-2) %>%
   raise_to_power(1/2)
 
-pooled3a==pooled3
+#pooled3a==pooled3
 
 ESall <- (mn1_m - bl1_m)/pooled2
 
@@ -320,14 +320,14 @@ ESall <- round(ESall, digits=2)
 
 data1 <- data.frame(Children, bl1_m, bl1_sd,mp1_m, mp1_sd, mn1_m, mn1_sd, pooled1, ESPhase1, pooled2, ESPhase2, pooled3, ESall)
 colnames(data1)[1] <- "subject" 
-str(data1)
+#str(data1)
 
 #Add demographic info
 demog  = read.csv("BFS2_demog.csv", header=T)
 demog$subject <- as.factor(demog$subject)
 data2 <- left_join(data1, demog, by="subject")
 data2$subject <- as.factor(data2$subject)
-str(data2)
+#str(data2)
 
 #Code by treatment type
 TRAD1 <- droplevels(subset(data2, tx_order=="TRAD_BF"))
@@ -339,6 +339,10 @@ BF1$ES_TRAD <- BF1$ESPhase2
 BF1$ES_BF <- BF1$ESPhase1
 
 data3 <- rbind(TRAD1, BF1) 
+data3short <- data3[,1:13]
+data3short$pooled1 <- NULL
+data3short$pooled2 <- NULL
+data3short$pooled3 <- NULL
 
 #Diff in effect size between BF and TRAD conditions
 #Putting BF first because hypothesized to have larger effect
@@ -391,7 +395,7 @@ sdTRADfirst <- sd(TRAD1$ESall)
 meanBFfirst <- mean(BF1$ESall)
 sdBFfirst <-sd(BF1$ESall)
 #Large absolute difference, but extremely variable across participants; not significant
-t.test(TRAD1$ESall, BF1$ESall)
+#t.test(TRAD1$ESall, BF1$ESall)
 
 ```
 
@@ -400,7 +404,7 @@ Effect sizes representing representing change in $\hat{p}_{correct}$ for the tre
 ```{r, echo=FALSE, fig.width=7, fig.height=2,message=FALSE, warning=FALSE}
 
 library(knitr)
-kable(data3)
+kable(data3short)
 ```
 
 ##Individual results: Visual inspection
@@ -419,7 +423,7 @@ For convenience, the single-subject graphs have been grouped into three sets of 
 #Read in data
 data <- read.csv("clean_data.csv")
 #Check that variables are of correct types
-str(data)
+#str(data)
 data$subject_number <- as.factor(data$subject_number)
 #Need to re-set ordered factors
 data$session = ordered(data$session, levels = c("BL1","BL2","BL3","BL4","BL5","TX1","TX2","TX3","TX4","TX5","TX6","TX7","TX8","TX9","TX10",
@@ -431,7 +435,7 @@ data <- droplevels(filter(data, subject=="Adrian"|subject=="Emily"|subject=="Lia
 
 #Specs for plotting
 par(mfrow=c(3,1))
-par(mar = c(2.5, 2.5, 2.5, 2.5))
+par(mar = c(.1, .1, .1, .1))
 par(xpd=FALSE)
 
 #Loop through participants
@@ -534,7 +538,7 @@ Figure 3 shows two participants, **Ian and Clara, whose effect sizes were smalle
 #Read in data
 data <- read.csv("clean_data.csv")
 #Check that variables are of correct types
-str(data)
+#str(data)
 data$subject_number <- as.factor(data$subject_number)
 #Need to re-set ordered factors
 data$session = ordered(data$session, levels = c("BL1","BL2","BL3","BL4","BL5","TX1","TX2","TX3","TX4","TX5","TX6","TX7","TX8","TX9","TX10",
@@ -546,7 +550,7 @@ data <- droplevels(filter(data, subject=="Jack"|subject=="Gabriel"))
 
 #Specs for plotting
 par(mfrow=c(3,1))
-par(mar = c(2.5, 2.5, 2.5, 2.5))
+par(mar = c(.1, .1, .1, .1))
 par(xpd=FALSE)
 
 #Loop through participants
@@ -649,7 +653,7 @@ Finally, Figure 4 shows three participants who demonstrated a null or negative e
 #Read in data
 data <- read.csv("clean_data.csv")
 #Check that variables are of correct types
-str(data)
+#str(data)
 data$subject_number <- as.factor(data$subject_number)
 #Need to re-set ordered factors
 data$session = ordered(data$session, levels = c("BL1","BL2","BL3","BL4","BL5","TX1","TX2","TX3","TX4","TX5","TX6","TX7","TX8","TX9","TX10",
@@ -661,7 +665,7 @@ data <- droplevels(filter(data, subject=="Brooklyn"|subject=="Hailey"|subject=="
 
 #Specs for plotting
 par(mfrow=c(3,1))
-par(mar = c(2.5, 2.5, 2.5, 2.5))
+par(mar = c(.1, .1, .1, .1))
 par(xpd=FALSE)
 
 #Loop through participants
@@ -777,9 +781,9 @@ Was there an order effect (independent of treatment type)?
 #WITHIN-TREATMNET CHANGE SCORES
 #############################################################
 data <- read.csv("clean_data.csv")
-dim(data)
+#dim(data)
 #Check that variables are of correct types
-str(data)
+#str(data)
 data$subject_number <- as.factor(data$subject_number)
 
 
@@ -816,10 +820,10 @@ TX <- spread(TX, prepost, percent)
 #Create a difference column
 #Subtract pre from post on assumption that post will be higher
 TX$diff <- TX$Post - TX$Pre
-head(TX)
+#head(TX)
 
 #Visualize the values
-TX$tx_order[1]
+#TX$tx_order[1]
 #Loop through participants
 Children <- levels(TX$subject)
 numerical <- 1:length(levels(TX$session))
@@ -836,7 +840,7 @@ for (i in seq_along(Children)){
 #Calculate means for each phase
 #Temp option to strike Hannah data due to missing session
 TX <- droplevels(TX[TX$subject!="Hannah",])
-str(TX)
+#str(TX)
 
 #Code by treatment phase (chronological order; 1 or 2)
 TX$phase <- 0
@@ -855,22 +859,22 @@ TX <- as.data.frame(TX)
 #Compare mean within-session change for first vs second phase (chronologically)
 phase1 <- droplevels(TX[TX$phase==1,])
 phase2 <- droplevels(TX[TX$phase==2,])
-mean(phase1$mean)
-sd(phase1$mean)
-mean(phase2$mean)
-sd(phase2$mean)
-t.test(phase1$mean, phase2$mean)
+#mean(phase1$mean)
+#sd(phase1$mean)
+#mean(phase2$mean)
+#sd(phase2$mean)
+#t.test(phase1$mean, phase2$mean)
 #NS
 
 #Compare mean within-session change for Trad phase vs BF phase 
 Trad <- droplevels(TX[TX$condition=="Trad",])
 BF <- droplevels(TX[TX$condition=="BF",])
-mean(Trad$mean)
-sd(Trad$mean)
-mean(BF$mean)
-sd(BF$mean)
+#mean(Trad$mean)
+#sd(Trad$mean)
+#mean(BF$mean)
+#sd(BF$mean)
 #Mean is larger for BF than Trad, but highly variable; nonsignificant
-t.test(BF$mean, Trad$mean)
+#t.test(BF$mean, Trad$mean)
 #NS
 
 #I don't know why this boxplot isn't working
@@ -880,7 +884,7 @@ t.test(BF$mean, Trad$mean)
 TX$phase <- NULL
 TX <- TX %>% 
   spread(condition, mean)
-t.test(TX$BF, TX$Trad, paired=TRUE)
+#t.test(TX$BF, TX$Trad, paired=TRUE)
 #Still definitely NS
 
 ```
