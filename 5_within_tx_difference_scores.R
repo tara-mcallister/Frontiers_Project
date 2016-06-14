@@ -69,6 +69,34 @@ for (i in seq_along(Children)){
   yline(0, lty=2)
 }
 
+#Add an order column
+TX$order <- 2
+TX[which(TX$condition=="Trad"&TX$tx_order=="TRAD_BF"),]$order <- 1
+TX[which(TX$condition=="BF"&TX$tx_order=="BF_TRAD"),]$order <- 1
+TX$order <- as.factor(TX$order)
+TX$order <- ordered(TX$order, levels=c("1","2"))
+str(TX)
+
+table(TX$condition, TX$order)
+
+#Mixed model
+diff.lm <- lmer(diff ~ condition*order + (condition|subject), data=TX)
+norand  <- lmer(diff ~ condition*order + (1|subject), data=TX)
+anova(diff.lm, norand)
+#NS
+nointeract <- lmer(diff ~ condition + order + (1|subject), data=TX)
+anova(diff.lm, nointeract)
+#NS
+nocondition <- lmer(diff ~ order + (1|subject), data=TX)
+anova(nocondition, nointeract)
+#NS
+noorder <- lmer(diff ~ condition + (1|subject), data=TX)
+anova(nointeract, noorder)
+#NS (.07)
+
+diff.lm <- lmer(diff ~ condition*order + (condition|subject), data=TX)
+
+
 #Calculate means for each phase
 #Temp option to strike Hannah data due to missing session
 TX <- droplevels(TX[TX$subject!="Hannah",])
@@ -119,10 +147,6 @@ TX <- TX %>%
 t.test(TX$BF, TX$Trad, paired=TRUE)
 #Still definitely NS
 TX$BFmean_TRADmean <- TX$BF - TX$Trad
-
-
-
-
 
 
 
