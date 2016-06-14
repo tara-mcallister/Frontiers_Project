@@ -129,7 +129,7 @@ wilcox.test(BF$mean, Trad$mean)
 # It would be interesting to look at how well within-treatment change (pre to post gain) 
 #correlates with an individual's accuracy or progress within the treatment setting. 
 
-tx_summary_data <- read.csv("summary_data.csv")
+tx_summary_data <- read.csv("tx_summary_data.csv")
 
 
 
