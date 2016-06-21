@@ -85,6 +85,11 @@ for (i in seq_along(Children)){
   bl1_sd[i] <- sd(bl1_perc)
 }
 
+#Grand BL SD--using the mean of individual BL SDs as a provisional estimate
+#of BL SD pooled across subjects (true pooled SD would be weighted to reflect
+#different subjects have different numbers of BL sessions)
+grandbl_sd <- mean(bl1_sd)
+
 #Midpoints
 #For each child, calculate the percent of "yes" votes out of total votes in each session
 #And average across sessions
@@ -105,6 +110,11 @@ for (i in seq_along(Children)){
   mp1_sd[i] <- sd(mp1_perc)
 }
 
+#Grand MP SD--using the mean of individual MP SDs 
+#This is the true value of MP SD pooled across subjects
+#because all subjects have same number of MP sessions)
+grandmp_sd <- mean(mp1_sd)
+
 #True maintenance points
 mn1 <- subset(tx1, sessiontype=="MN")
 nmn <- c()
@@ -123,42 +133,51 @@ for (i in seq_along(Children)){
   mn1_sd[i] <- sd(mn1_perc)
 }
 
+
 #Effect size 1: BL to MP
+#Calculate SD pooled across baseline and MP phases
 pooled1a <- sqrt(((nbl-1)*(bl1_sd^2) + (nmp-1)*(mp1_sd^2))/(nbl+nmp-2))
-
-pooled1 <- ((nbl-1)*(bl1_sd^2)) %>%
-  add((nmp-1)*(mp1_sd^2)) %>%
-  divide_by(nbl+nmp-2) %>%
-  raise_to_power(1/2)
-
-pooled1a==pooled1
-
+    #Alternative using magrittr syntax
+    pooled1 <- ((nbl-1)*(bl1_sd^2)) %>%
+      add((nmp-1)*(mp1_sd^2)) %>%
+      divide_by(nbl+nmp-2) %>%
+      raise_to_power(1/2)
+    #Check that they yield the same output
+    pooled1a==pooled1
+#Effect size = mean level difference divided by pooled SD
 ESPhase1 <- (mp1_m - bl1_m)/pooled1
+#Alternative using SD pooled across subjects (estimated with grandbl_sd)
+ESPhase1AS <- (mp1_m - bl1_m)/grandbl_sd
 
 #Effect size 2: MP to MN
+#Calculate SD pooled across MP and MN phases
 pooled2a <- sqrt(((nmp-1)*(mp1_sd^2) + (nmn-1)*(mn1_sd^2))/(nmp+nmn-2))
-
-pooled2 <- ((nmp-1)*(mp1_sd^2)) %>%
-  add((nmn-1)*(mn1_sd^2)) %>%
-  divide_by(nmp+nmn-2) %>%
-  raise_to_power(1/2)
-
-pooled2a==pooled2
-
+    #Alternative using magrittr syntax
+    pooled2 <- ((nmp-1)*(mp1_sd^2)) %>%
+      add((nmn-1)*(mn1_sd^2)) %>%
+      divide_by(nmp+nmn-2) %>%
+      raise_to_power(1/2)
+    #Check that they yield the same output
+    pooled2a==pooled2
+#Effect size = mean level difference divided by pooled SD
 ESPhase2 <- (mn1_m - mp1_m)/pooled2
+#Using SD pooled across subjects (grandmp_sd)
+ESPhase2AS <- (mn1_m - mp1_m)/grandmp_sd
 
 #Effect size 3: BL to MN
+#Calculate SD pooled across baseline and MN phases
 pooled3a <- sqrt(((nbl-1)*(bl1_sd^2) + (nmn-1)*(mn1_sd^2))/(nbl+nmn-2))
-
-pooled3 <- ((nbl-1)*(bl1_sd^2)) %>%
-  add((nmn-1)*(mn1_sd^2)) %>%
-  divide_by(nbl+nmn-2) %>%
-  raise_to_power(1/2)
-
-pooled3a==pooled3
-
-ESall <- (mn1_m - bl1_m)/pooled2
-
+    #Alternative using magrittr syntax
+    pooled3 <- ((nbl-1)*(bl1_sd^2)) %>%
+      add((nmn-1)*(mn1_sd^2)) %>%
+      divide_by(nbl+nmn-2) %>%
+      raise_to_power(1/2)
+    #Check that they yield the same output
+    pooled3a==pooled3
+#Effect size = mean level difference divided by pooled SD
+ESall <- (mn1_m - bl1_m)/pooled3
+#Using SD pooled across subjects (grandbl_sd)
+ESallAS <- (mn1_m - bl1_m)/grandbl_sd
 
 bl1_m <- round(bl1_m, digits=2)
 bl1_sd <- round(bl1_sd, digits=2)
@@ -168,12 +187,15 @@ mn1_m <- round(mn1_m, digits=2)
 mn1_sd <- round(mn1_sd, digits=2)
 pooled1 <- round(pooled1, digits=2)
 ESPhase1 <- round(ESPhase1, digits=2)
+ESPhase1AS <- round(ESPhase1AS, digits=2)
 pooled2 <- round(pooled2, digits=2)
 ESPhase2 <- round(ESPhase2, digits=2)
+ESPhase2AS <- round(ESPhase2AS, digits=2)
 pooled3 <- round(pooled3, digits=2)
 ESall <- round(ESall, digits=2)
+ESallAS <- round(ESallAS, digits=2)
 
-data1 <- data.frame(Children, bl1_m, bl1_sd,mp1_m, mp1_sd, mn1_m, mn1_sd, pooled1, ESPhase1, pooled2, ESPhase2, pooled3, ESall)
+data1 <- data.frame(Children, bl1_m, bl1_sd,mp1_m, mp1_sd, mn1_m, mn1_sd, pooled1, ESPhase1, ESPhase1AS, pooled2, ESPhase2, ESPhase2AS, pooled3, ESall, ESallAS)
 colnames(data1)[1] <- "subject" 
 str(data1)
 
@@ -189,26 +211,40 @@ TRAD1 <- droplevels(subset(data2, tx_order=="TRAD_BF"))
 TRAD1$ES_TRAD <- TRAD1$ESPhase1
 TRAD1$ES_BF <- TRAD1$ESPhase2
 
+#Alternatives with across-subjects effect size
+TRAD1$ES_TRAD_AS <- TRAD1$ESPhase1AS
+TRAD1$ES_BF_AS <- TRAD1$ESPhase2AS
+
 BF1 <- droplevels(subset(data2, tx_order=="BF_TRAD"))
 BF1$ES_TRAD <- BF1$ESPhase2
 BF1$ES_BF <- BF1$ESPhase1
+#Alternatives with across-subjects effect size
+BF1$ES_TRAD_AS <- BF1$ESPhase2AS
+BF1$ES_BF_AS <- BF1$ESPhase1AS
 
 data3 <- rbind(TRAD1, BF1) 
 
 #Diff in effect size between BF and TRAD conditions
 #Putting BF first because hypothesized to have larger effect
 data3$BF_advantage <- data3$ES_BF - data3$ES_TRAD
+#Alternative with across-subjects effect size
+data3$BF_advantage_AS <- data3$ES_BF_AS - data3$ES_TRAD_AS
 
 #Diff in effect size between first and second phases
 #Putting Phase 2 first because hypothesized to show cumulative effect
 data3$order_effect <- data3$ESPhase2 - data3$ESPhase1
+data3$order_effect_AS <- data3$ESPhase2AS - data3$ESPhase1AS
+
 
 ######################################################
 ######################################################
 #Write complete data table to file
-#write.csv(data3, "cohort2_EF_data.csv")
+write.csv(data3, "cohort2_EF_data.csv")
 #######################################################
 ######################################################
+#COMPARE EFFECT SIZES ACROSS CONDITIONS
+#First, comparing with ES calculated using SD pooled across BL and MN 
+#within each subject
 
 #Mean effect size across all participants for trad phase and BF phase
 tradmeanES <- mean(data3$ES_TRAD)
@@ -247,3 +283,45 @@ meanBFfirst <- mean(BF1$ESall)
 sdBFfirst <-sd(BF1$ESall)
 #Large absolute difference, but extremely variable across participants; not significant
 t.test(TRAD1$ESall, BF1$ESall)
+
+
+#COMPARE EFFECT SIZES ACROSS CONDITIONS
+#Now comparing with ES calculated using SD pooled across subjects
+
+#Mean effect size across all participants for trad phase and BF phase
+tradmeanES_AS <- mean(data3$ES_TRAD_AS)
+BFmeanES_AS <- mean(data3$ES_BF_AS)
+
+#Mean difference between BF and TRAD
+#Small BF advantage, but lots of variability (large SD)
+meanBFadvantageAS <- mean(data3$BF_advantage_AS) 
+sdBFadvantageAS <- sd(data3$BF_advantage_AS) 
+
+#Mean diff between phase 1 and phase 2 
+#Generally a larger effect in phase 1 than phase 2, unexpectedly
+#Note large SD
+meanorderAS <- mean(data3$order_effect_AS)
+sdorder <- sd(data3$order_effect_AS)
+
+#Does the comparison of phase 1 vs phase 2 look different in BF-first vs TRAD-first?
+#TRAD1 <- droplevels(subset(data3, tx_order=="TRAD_BF"))
+meanTRADorderAS <- mean(TRAD1$order_effect_AS)
+sdTRADorder_AS <- sd(TRAD1$order_effect_AS)
+
+#BF1 <- droplevels(subset(data3, tx_order=="BF_TRAD"))
+meanBForderAS <- mean(BF1$order_effect_AS)
+sdBForderAS <- sd(BF1$order_effect_AS)
+
+#Both groups show larger generalization gains in phase 1 than phase 2
+#But the difference is greater (advantage for phase 1 is greater) for BF-first group
+#Note that this is not in keeping with the prediction that BF is better for acquisition 
+#and TRAD is better for generalization
+
+#Does overal effect size look different in BF-first vs TRAD-first?
+meanTRADfirstAS <- mean(TRAD1$ESallAS)
+sdTRADfirstAS <- sd(TRAD1$ESallAS)
+
+meanBFfirst <- mean(BF1$ESallAS)
+sdBFfirst <-sd(BF1$ESallAS)
+#Large absolute difference, but extremely variable across participants; not significant
+t.test(TRAD1$ESallAS, BF1$ESallAS)
