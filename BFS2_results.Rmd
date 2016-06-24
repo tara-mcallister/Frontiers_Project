@@ -2,7 +2,7 @@
 title: "Frontiers paper"
 author: "Tara McAllister Byun and Heather Campbell"
 date: "June 24, 2016"
-output: html_document
+output: pdf_document
 ---
 ```{r, echo=FALSE, include=FALSE, message=FALSE, warning=FALSE}
 ########################################
@@ -308,6 +308,11 @@ ESPhase2 <- round(ESPhase2, digits=2)
 pooled3 <- round(pooled3, digits=2)
 ESall <- round(ESall, digits=2)
 
+##baseline stability:  Comment on baseline stability: Which participants met the criterion of <10% mean session-to-session variability over the baseline interval? Which participants have demonstrations of noneffect in the baseline phase?**
+BL_variability <- data.frame(subject = Children, baseline_stability = (bl1_sd/bl1_m)*100)
+BL_stable <- subset(BL_variability, BL_variability$baseline_stability < 10)
+BL_stable$subject
+
 data1 <- data.frame(Children, bl1_m, bl1_sd,mp1_m, mp1_sd, mn1_m, mn1_sd, pooled1, ESPhase1, pooled2, ESPhase2, pooled3, ESall)
 colnames(data1)[1] <- "subject" 
 #str(data1)
@@ -359,7 +364,7 @@ Figures 2-4 represent each participant's pattern of change in accuracy ($\hat{p}
 
 The mean number of probe words on which $\hat{p}_{correct}$ scores are based was `r round(mPREPOST, digits=2)` (SD = `r round(sdPREPOST, digits=2)`) for pre- and post-treatment probes and ###`r mBLMN` (SD = `r sdBLMN`) for baseline and maintenance probes. The number of ratings collected in connection with a given probe session (i.e., the denominator in $\hat{p}_{correct}$) was roughly nine times the number of items in that probe and often was larger.
 
-For convenience, the single-subject graphs have been grouped into three sets of 3-4 participants who demonstrated broadly similar patterns of response to treatment. Figure 2 depicts four participants for whom visual inspection provided strong evidence of a response to at least one type of treatment, and Figure 3 shows three participants for whom visual inspection provided moderate support of a response to treatment. Finally, Figure 3 shows four participants who showed no reliable evidence of a response to treatment. The participants in each group are discussed in detail below. **Comment on baseline stability: Which participants met the criterion of <10% mean session-to-session variability over the baseline interval? Which participants have demonstrations of noneffect in the baseline phase?**
+For convenience, the single-subject graphs have been grouped into three sets of 3-4 participants who demonstrated broadly similar patterns of response to treatment. Figure 2 depicts four participants for whom visual inspection provided strong evidence of a response to at least one type of treatment, and Figure 3 shows three participants for whom visual inspection provided moderate support of a response to treatment. Finally, Figure 3 shows four participants who showed no reliable evidence of a response to treatment. The participants in each group are discussed in detail below. **Comment on baseline stability: Which participants met the criterion of <10% mean session-to-session variability over the baseline interval? Which participants have demonstrations of noneffect in the baseline phase?** Those participants who met the criterion of <10% mean session-to-session variability (calculated as the baseline standard deviation divided by the baseline mean) were `r BL_stable$subject`. 
 
 Visual inspection of data from `r paste(demog$age_enrollment_years[demog$subject=="Adrian"], demog$age_enrollment_months[demog$subject=="Adrian"], sep=";")` year-old Adrian shows a large change in level between the baseline phase and all subsequent phases of treatment, with minimal overlap between observations in the baseline phase and any subsequent phase. This change occurred immediately after the initiation of treatment. Adrian's progress in the first phase, which featured traditional articulatory treatment, yielded a large ES~Phase1~ of `r data3$ESPhase1[data3$subject=="Adrian"]`. His performance declined slightly in the second phase, which featured biofeedback treatment, yielding an ES~Phase2~ of `r data3$ESPhase2[data3$subject=="Adrian"]` from midpoint to maintenance. However, his performance still remained substantially above baseline levels, with a final ES~All~ of `r data3short[1,10]`. **Is unstable baseline a threat to internal validity?**
 
