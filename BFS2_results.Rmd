@@ -2,8 +2,7 @@
 title: "Frontiers paper"
 author: "Tara McAllister Byun and Heather Campbell"
 date: "June 6, 2016"
-geometry: margin=2.54cm
-output: word_document
+output: html_document
 header-includes:
 - \usepackage[utf8]{inputenc}
 - \usepackage[T1]{fontenc}
@@ -14,7 +13,7 @@ header-includes:
 - \usepackage{setspace}
 - \usepackage{httpuv}
 - \doublespacing
-
+geometry: margin=2.54cm
 ---
 ```{r, echo=FALSE, include=FALSE, message=FALSE, warning=FALSE}
 ########################################
@@ -269,40 +268,43 @@ for (i in seq_along(Children)){
 }
 
 #Effect size 1: BL to MP
+#Calculate SD pooled across baseline and MP phases
 pooled1a <- sqrt(((nbl-1)*(bl1_sd^2) + (nmp-1)*(mp1_sd^2))/(nbl+nmp-2))
-
-pooled1 <- ((nbl-1)*(bl1_sd^2)) %>%
-  add((nmp-1)*(mp1_sd^2)) %>%
-  divide_by(nbl+nmp-2) %>%
-  raise_to_power(1/2)
-
-#pooled1a==pooled1
-
+    #Alternative using magrittr syntax
+    pooled1 <- ((nbl-1)*(bl1_sd^2)) %>%
+      add((nmp-1)*(mp1_sd^2)) %>%
+      divide_by(nbl+nmp-2) %>%
+      raise_to_power(1/2)
+    #Check that they yield the same output
+    pooled1a==pooled1
+#Effect size = mean level difference divided by pooled SD
 ESPhase1 <- (mp1_m - bl1_m)/pooled1
 
 #Effect size 2: MP to MN
+#Calculate SD pooled across MP and MN phases
 pooled2a <- sqrt(((nmp-1)*(mp1_sd^2) + (nmn-1)*(mn1_sd^2))/(nmp+nmn-2))
-
-pooled2 <- ((nmp-1)*(mp1_sd^2)) %>%
-  add((nmn-1)*(mn1_sd^2)) %>%
-  divide_by(nmp+nmn-2) %>%
-  raise_to_power(1/2)
-
-#pooled2a==pooled2
-
+    #Alternative using magrittr syntax
+    pooled2 <- ((nmp-1)*(mp1_sd^2)) %>%
+      add((nmn-1)*(mn1_sd^2)) %>%
+      divide_by(nmp+nmn-2) %>%
+      raise_to_power(1/2)
+    #Check that they yield the same output
+    pooled2a==pooled2
+#Effect size = mean level difference divided by pooled SD
 ESPhase2 <- (mn1_m - mp1_m)/pooled2
 
 #Effect size 3: BL to MN
+#Calculate SD pooled across baseline and MN phases
 pooled3a <- sqrt(((nbl-1)*(bl1_sd^2) + (nmn-1)*(mn1_sd^2))/(nbl+nmn-2))
-
-pooled3 <- ((nbl-1)*(bl1_sd^2)) %>%
-  add((nmn-1)*(mn1_sd^2)) %>%
-  divide_by(nbl+nmn-2) %>%
-  raise_to_power(1/2)
-
-#pooled3a==pooled3
-
-ESall <- (mn1_m - bl1_m)/pooled2
+    #Alternative using magrittr syntax
+    pooled3 <- ((nbl-1)*(bl1_sd^2)) %>%
+      add((nmn-1)*(mn1_sd^2)) %>%
+      divide_by(nbl+nmn-2) %>%
+      raise_to_power(1/2)
+    #Check that they yield the same output
+    pooled3a==pooled3
+#Effect size = mean level difference divided by pooled SD
+ESall <- (mn1_m - bl1_m)/pooled3
 
 
 bl1_m <- round(bl1_m, digits=2)
@@ -353,53 +355,9 @@ data3$BF_advantage <- data3$ES_BF - data3$ES_TRAD
 data3$order_effect <- data3$ESPhase2 - data3$ESPhase1
 
 ######################################################
-######################################################
-#Write complete data table to file
-#write.csv(data3, "cohort2_EF_data.csv")
-#######################################################
-######################################################
-
-#Mean effect size across all participants for trad phase and BF phase
-tradmeanES <- mean(data3$ES_TRAD)
-BFmeanES <- mean(data3$ES_BF)
-
-#Mean difference between BF and TRAD
-#Small BF advantage, but lots of variability (large SD)
-meanBFadvantage <- mean(data3$BF_advantage) 
-sdBFadvantage <- sd(data3$BF_advantage) 
-
-#Mean diff between phase 1 and phase 2 
-#Generally a larger effect in phase 1 than phase 2, unexpectedly
-#Note large SD
-meanorder <- mean(data3$order_effect)
-sdorder <- sd(data3$order_effect)
-
-#Does the comparison of phase 1 vs phase 2 look different in BF-first vs TRAD-first?
-TRAD1 <- droplevels(subset(data3, tx_order=="TRAD_BF"))
-meanTRADorder <- mean(TRAD1$order_effect)
-sdTRADorder <- sd(TRAD1$order_effect)
-
-BF1 <- droplevels(subset(data3, tx_order=="BF_TRAD"))
-meanBForder <- mean(BF1$order_effect)
-sdBForder <- sd(BF1$order_effect)
-
-#Both groups show larger generalization gains in phase 1 than phase 2
-#But the difference is greater (advantage for phase 1 is greater) for BF-first group
-#Note that this is not in keeping with the prediction that BF is better for acquisition 
-#and TRAD is better for generalization
-
-#Does overal effect size look different in BF-first vs TRAD-first?
-meanTRADfirst <- mean(TRAD1$ESall)
-sdTRADfirst <- sd(TRAD1$ESall)
-
-meanBFfirst <- mean(BF1$ESall)
-sdBFfirst <-sd(BF1$ESall)
-#Large absolute difference, but extremely variable across participants; not significant
-#t.test(TRAD1$ESall, BF1$ESall)
-
 ```
 
-Effect sizes representing representing change in $\hat{p}_{correct}$ for the treated variant, vocalic /r/, are reported for all participants in Table 3. The first column shows participants' mean $\hat{p}_{correct}$ in the baseline period, averaged across all vocalic /r/ items from all sessions. The second column shows the equivalent mean across the three midpoint sessions, and the third shows the three maintenance sessions. The next three columns report three standardized effect sizes: ES~Phase1~ compares baseline versus midpoint scores, ES~Phase2~ compares midpoint versus maintenance scores, and ES~all~ compares baseline versus maintenance, reflecting overall gains across both phases of treatment. Participants are blocked by the order in which they received treatment (traditional-first or biofeedback-first). **The effect sizes in Table 3 show a wide range of variability in overall response to treatment across individuals. Averaging effect sizes across all participants yields a mean of `r #round(meanES, digits=2)`, suggesting that on average, participants' response to the combined biofeedback and traditional treatment package was positive and exceeded the minimum value considered clinically significant. Individual patterns of response will be examined in detail in the next section. **
+Effect sizes representing change in $\hat{p}_{correct}$ for the treated variant, vocalic /r/, are reported for all participants in Table 3. The first column shows participants' mean $\hat{p}_{correct}$ in the baseline period, averaged across all vocalic /r/ items from all sessions. The second column shows the equivalent mean across the three midpoint sessions, and the third shows the three maintenance sessions. The next three columns report three standardized effect sizes: ES~Phase1~ compares baseline versus midpoint scores, ES~Phase2~ compares midpoint versus maintenance scores, and ES~all~ compares baseline versus maintenance, reflecting overall gains across both phases of treatment. Participants are blocked by the order in which they received treatment (traditional-first or biofeedback-first). **The effect sizes in Table 3 show a wide range of variability in overall response to treatment across individuals. Averaging effect sizes across all participants yields a mean of `r*** round(mean(data3$ESall), digits=2)`, suggesting that on average, participants' response to the combined biofeedback and traditional treatment package was positive and exceeded the minimum value considered clinically significant. Individual patterns of response will be examined in detail in the next section. **
 
 ```{r, echo=FALSE, fig.width=7, fig.height=2,message=FALSE, warning=FALSE}
 
@@ -413,7 +371,13 @@ Figures 2-4 represent each participant's pattern of change in accuracy ($\hat{p}
 
 The mean number of probe words on which $\hat{p}_{correct}$ scores are based was `r mPREPOST` (SD = `r sdPREPOST`) for pre- and post-treatment probes and `r mBLMN` (SD = `r sdBLMN`) for baseline and maintenance probes. The number of ratings collected in connection with a given probe session (i.e., the denominator in $\hat{p}_{correct}$) was roughly nine times the number of items in that probe and often was larger.
 
-For convenience, the single-subject graphs have been grouped into three sets of 2-5 participants who demonstrated similar effect sizes. Figure 2 depicts five participants who demonstrated a robust response to treatment (effect sizes of `r #data2[7,6]` and `r #data2[4,6]`, respectively). **Piper began with relatively high accuracy and rapidly attained ceiling-level accuracy, which she sustained through the remainder of treatment and the maintenance period. Garrett began with much lower accuracy and showed no meaningful progress on word probes for an extended period of time, but in the later part of the study he made slow but continuous gains. His accuracy in the maintenance period was substantially higher than its level at baseline, although his scores remained well below ceiling-level accuracy.** 
+For convenience, the single-subject graphs have been grouped into three sets of 3-4 participants who demonstrated broadly similar patterns of response to treatment. Figure 2 depicts four participants for whom visual inspection provided strong evidence of a response to at least one type of treatment, and Figure 3 shows three participants for whom visual inspection provided moderate support of a response to treatment. Finally, Figure 3 shows four participants who showed no reliable evidence of a response to treatment. The participants in each group are discussed in detail below. **Comment on baseline stability: Which participants met the criterion of <10% mean session-to-session variability over the baseline interval? Which participants have demonstrations of noneffect in the baseline phase?**
+
+Visual inspection of data from X-year-old Adrian shows a large change in level between the baseline phase and all subsequent phases of treatment, with minimal overlap between observations in the baseline phase and any subsequent phase. This change occurred immediately after the initiation of treatment. Adrian's progress in the first phase, which featured traditional articulatory treatment, yielded a large ES~Phase1~ of `***r data3[1,9]`. His performance declined slightly in the second phase, which featured biofeedback treatment, yielding an ES~Phase2~ of `r #data2[4,6]` from midpoint to maintenance. However, his performance still remained substantially above baseline levels, with a final ES~All~ of `r #data2[4,6]`. **Is unstable baseline a threat to internal validity?**
+
+Emma, age X;X, also showed a sizable change in level between the baseline phase and all subsequent phases of the study. This change was evident in post-treatment word probes within the first three sessions of treatment; from the fourth session on, there was virtually no overlap of data points with the baseline phase. The first phase, which featured biofeedback treatment, yielded an ES~Phase1~ of `r #data2[4,6]`. Emma's gains remained mostly stable through the second phase of treatment and the maintenance period, yielding an ES~All~ of `r #data2[4,6]`. Overlap with the baseline phase was minimal from the midpoint session on. **Is unstable/rising baseline a threat to validity?**
+
+Participants Liam, age X;X, and Madison, age Y;Y, exhibited similar trajectories of progress, although Madison showed higher overall accuracy throughout the study. Like Emma, both boys began in the biofeedback treatment condition and began to show gains within the first three sessions of treatment; they sustained their gains during midpoint probes and made additional improvements in the second phase of treatment. They likewise showed no overlap between the baseline phase and data points in the midpoint phase, second phase of treatment, or maintenance phase. In Madison's case, there also was very little overlap between the baseline phase and the first phase of treatment. For both boys, a larger effect size was calculated for the first phase of treatment, in which biofeedback was provided, although this could be attributed to a ceiling effect in Madison's case. Large overall effect sizes of `r #data2[4,6]` and `r #data2[4,6]` were observed for Liam and Madison, respectively. **Demonstration of noneffect: trend in Liam's baseline data?** **What is going on with Madison's tx2 pre-probe? Might there be missing data?**
 
 
 ```{r, echo=FALSE, fig.width=7, fig.height=2,message=FALSE, warning=FALSE,strip.white=TRUE}
@@ -431,7 +395,7 @@ data$session = ordered(data$session, levels = c("BL1","BL2","BL3","BL4","BL5","T
                                                 "TX13","TX14","TX15","TX16","TX17","TX18","TX19","TX20","MN1","MN2","MN3"))   
 
 #Subset to appropriate group of children
-data <- droplevels(filter(data, subject=="Adrian"|subject=="Emily"|subject=="Liam"|subject=="Emma"|subject=="Madison"))
+data <- droplevels(filter(data, subject=="Adrian"|subject=="Liam"|subject=="Emma"|subject=="Madison"))
 
 #Specs for plotting
 par(mfrow=c(3,1))
@@ -529,7 +493,11 @@ for (i in seq_along(Children)){
 **Figure 2. Longitudinal plots of $\hat{p}_{correct}$ for participants with large positive effect sizes. Dashed line represents mean across baseline sessions. BL = Baseline, Tx = Treatment, MN = Maintenance.**
 
 
-Figure 3 shows two participants, **Ian and Clara, whose effect sizes were smaller but still exceeded the minimum to be considered clinically relevant (`r #data2[5,6]` and `r #data2[1,6]`, respectively). Visual inspection reveals a pattern of change over time that is also consistent  with a meaningful response to treatment. Ian, who had the longest duration of previous unsuccessful treatment out of all participants in the study, exhibited virtually no change in accuracy in the first 15 sessions of treatment. In the final five sessions, though, his accuracy in pre-treatment probes reliably exceeded baseline levels, with substantial additional gains in each post-treatment probe. Unfortunately, these gains were tenuous, and scores drifted back down to baseline levels over the course of the maintenance period. Clara reliably exceeded baseline-level performance in both pre- and post-treatment probes throughout the course of treatment. Like Ian, though, her gains appeared substantially weaker in the post-treatment maintenance interval. This may relect the fact that the full probe measure administered in baseline and maintenance sessions contained additional items that were less familiar than the fixed 25-word subset that was administered at the start and end of each treatment session.**
+Figure 3 shows three participants for whom visual inspection offered moderate evidence of a response to at least one type of treatment. Emily, age X;X, showed no visual evidence of improvement in the first phase, which featured traditional treatment. (An ES~Phase1~ of `r #data2[4,6]` was computed for her, but given that the raw difference in means was only XX, this was judged to be an artifact of low variance during the baseline phase.) During the second phase of treatment, Emily showed a change in trend from an unchanging near-zero level of accuracy to a small but consistent increase. This effect is ambiguous to interpret, since it emerged only in the last three sessions of the study and thus could reflect a cumulative effect of treatment over the preceding XX months. Interestingly, the rising trend that Emily exhibited in her last three sessions of treatment continued into the maintenance phase, suggesting that ongoing generalization gains might be anticipated. Her final effect size of ES~All~ reflected strong overall gains.
+
+Participant Jack, age Y;Y, showed a trajectory that was in some ways a mirror image of Emily's. Both visual inspection and effect size showed no meaningful change during the first phase of treatment, which featured biofeedback. He also showed no change throughout most of the second treatment phase, but in the final few sessions, his perceptually rated accuracy took on a distinct upward slope. Unlike Emily, his gains tended to affect post-test but not pre-test probes, and accuracy was not sustained throughout the maintenance period. This suggests more short-term learning that was not yet robustly transfering to other contexts. Accordingly, the effect sizes calculated using midpoint and maintenance probe data suggested a weaker effect of treatment than the within-treatment probes (ES~Phase1~: `r #data2[4,6]`; ES~Phase2~: `r #data2[4,6]`; ES~All~: `r #data2[4,6]`). **What's going on with Jack's TX1 pre probe?** 
+
+Participant Gabriel, age Z;Z, showed a small increase in the perceptually rated accuracy of rhotics produced during Phase 1, followed by a slightly larger increase during Phase 2. Ongoing overlap in data points between baseline and treatment phases prevents us from attaching a strong interpretation to these data, and gains were minimally sustained into the midpoint and maintenance probe intervals. All three effect sizes computed for Gabriel fell short of the threshold to be considered clinically significant (ES~Phase1~: `r #data2[4,6]`; ES~Phase2~: `r #data2[4,6]`; ES~All~: `r #data2[4,6]`). On the other hand, Gabriel's accuracy during both phases of treatment was much more variable than at baseline. This suggested that he was engaging some degree of exploration of new strategies for rhotic production, although he had not yet stabilized a production pattern that would reliably yield a perceptually accurate rhotic sound.
 
 ```{r, echo=FALSE, fig.width=7, fig.height=2,message=FALSE, warning=FALSE}
 #################################################################
@@ -546,7 +514,7 @@ data$session = ordered(data$session, levels = c("BL1","BL2","BL3","BL4","BL5","T
                                                 "TX13","TX14","TX15","TX16","TX17","TX18","TX19","TX20","MN1","MN2","MN3"))   
 
 #Subset to appropriate group of children
-data <- droplevels(filter(data, subject=="Jack"|subject=="Gabriel"))
+data <- droplevels(filter(data, subject=="Emily"|subject=="Jack"|subject=="Gabriel"))
 
 #Specs for plotting
 par(mfrow=c(3,1))
@@ -643,12 +611,12 @@ for (i in seq_along(Children)){
 
 **Figure 3. Longitudinal plots of $\hat{p}_{correct}$ for participants with small positive effect sizes. Dashed line represents mean across baseline sessions. BL = Baseline, Tx = Treatment, MN = Maintenance.**
 
-Finally, Figure 4 shows three participants who demonstrated a null or negative effect size over the course of the study. **One participant, Felix, showed virtually no variation in accuracy over the course of the study, yielding a final effect size of `r #data2[3,6]`. The second participant, Lucas, showed a similar effect size (`r #data2[6,6]`) but exhibited much more variability in his performance within treatment sessions, including scores substantially higher and lower than the baseline mean. This case will be examined in greater detail below in connection with the discussion of relative response to biofeedback versus traditional treatment. The last participant, Evan, showed a small but continuous decline in accuracy over the course of treatment. The overall magnitude of this decrease was less than 10 percentage points, but the standardized effect size was quite large, `r #data2[2,6]`. This is in part a reflection of unusually low variance in Evan's ratings: his pooled standard deviation in $\hat{p}_{correct}$ was `r #data2[2,5]`, whereas the standard deviation averaged across the group was `r #meanpooled` (SD = `r #sdpooled`).** 
+Finally, Figure 4 depicts the four participants for whom visual inspection of generalization probe data yielded no significant evidence of a response to either type of treatment. Three of these participants (Brooklyn, Hailey, and Hannah) began treatment in the traditional treatment condition, while one participant (Connor) received treatment in the opposite order. Across all of these participants, visual inspection of perceptual rating data yields a consistent picture of minimal change across all phases of the study. Effect sizes are generally in accordance with visual inspection; an exception is Connor's ES~Phase1~ of `r #data2[4,6]`, but this value is inflated by minimal variance during the baseline phase. Note also that most participants in this group had near-zero perceptual accuracy ratings at baseline, contrasting with the more intermediate accuracy ratings given to participants in the other groups; we return to this topic in the discussion section.
 
 
 ```{r, echo=FALSE, fig.width=7, fig.height=2,message=FALSE, warning=FALSE}
 #################################################################
-#FIGURE 3: NULL/NEGATIVE EFFECT SIZES
+#FIGURE 3: NULL EFFECT SIZES
 #################################################################
 #Read in data
 data <- read.csv("clean_data.csv")
@@ -758,27 +726,35 @@ for (i in seq_along(Children)){
 
 **Figure 4. Longitudinal plots of $\hat{p}_{correct}$ for participants with null or negative effect size. Dashed line represents mean across baseline sessions. BL = Baseline, Tx = Treatment, MN = Maintenance.**
 
-```{r, echo=FALSE, fig.width=7, fig.height=2,message=FALSE, warning=FALSE}
-   
-```
 
-##Comparing biofeedback versus traditional: Generalization probes
+##Comparison of results across conditions: Effect sizes
 
-Considering generalization gains in each phase (BL-MP and MP-MN):
-Which participants showed an advantage for one phase over the other?
-Was there an effect of BF vs traditional (independent of order)?
-Was there an order effect (independent of treatment type)?
+###Is there an order effect (ES~Phase1~ > ES~Phase2~, or vice versa?)
+-Boxplot depicting ES~Phase1~ across participants; boxplot depicting ES~Phase2~ across participants; boxplot depicting difference between ES~Phase1~ and ES~Phase2~ across participants.
+-Include t-test? (or leave hypothesis-testing to mixed model?)
 
-##Comparing biofeedback versus traditional: Short-term gains
+###Is there an effect of treatment condition (ES~BF~ > ES~TRAD~, or vice versa?)
+-Boxplot depicting ES~BF~ across participants; boxplot depicting ES~TRAD~ across participants; boxplot depicting difference between ES~BF~ and ES~TRAD~ across participants.
+-Include t-test?
 
-Considering within-treatment gains (Post-Pre, averaged across sessions in a phase):
-Which participants showed an advantage for one phase over the other?
-Was there an effect of BF vs traditional (independent of order)?
-Was there an order effect (independent of treatment type)?
+###Does order of treatment delivery influence overall effect size (BF-TRAD > TRAD-BF, or vice versa?)
+-Boxplot depicting ES~All~ across participants in BF-first condition; boxplot depicting ES~All~ across participants in TRAD-first condition
+-Include t-test?
+
+##Comparison of results across conditions: Mixed logistic model
 
 ```{r, echo=FALSE, fig.width=7, fig.height=2.5,message=FALSE, warning=FALSE}
 #############################################################
-#WITHIN-TREATMNET CHANGE SCORES
+#LOGISTIC MIXED MODEL
+#############################################################
+
+```
+
+In the logistic mixed model described above, treatment condition (TRAD versus BF) was a significant predictor of /r/ production accuracy ((*$\beta$* = `r #pre_b`, *SE* = `r #pre_sd`, , *p* = `r #pre_p`), with the coefficient indicating that the reference level, traditional treatment, was associated with lower accuracy than post-treatment probes. Order of treatment delivery (biofeedback-first versus traditional-first) was not a significant predictor (*$\beta$* = `r #condition_b`, *SE* = `r #condition_sd`, , *p* = `r #condition_p`), but the interaction between treatment type and treatment order was significant (*$\beta$* = `r #int_b`, *SE* = `r #int_sd`, , *p* = `r #int_p`). This interaction can be visualized in Figure 5, which plots accuracy in within-treatment probes (pre- and post-probes) during both biofeedback and traditional treatment conditions; they are pooled across subjects but partitioned by the order of treatment application (BF-first or TRAD-first). Figure 5 shows that accuracy scores tended to be higher in the BF-first order than the TRAD-first order, although this effect was not significant. Furthermore, the main effect of condition (TRAD > BF) appears to be driven heavily by the BF-first group. Complete regression results are reported in On-line Supplement A. FIX: Should use phase designation (phase 1 vs phase 2) instead phase order (BF_TRAD vs TRAD_BF)??
+
+```{r, echo=FALSE, fig.width=7, fig.height=2.5,message=FALSE, warning=FALSE}
+#############################################################
+#WITHIN-TREATMENT CHANGE SCORES: OMIT THIS?
 #############################################################
 data <- read.csv("clean_data.csv")
 #dim(data)
@@ -889,7 +865,17 @@ TX <- TX %>%
 
 ```
 
-##Overall order effect
-Compare BF_TRAD versus TRAD_BF groups.
-Mixed model?
 
+#DISCUSSION
+
+-Clearly there were both responders and non-responders. Can we identify individual characteristics that predict response to treatment? Comment on possibe subtypes/profiles.
+-Correlation between ES~All~ and age
+-Correlation between ES~All~ and baseline accuracy (participants who start out more accurate tend to gain more)
+-Correlation between ES~All~ and duration of previous treatment?
+-Correlation between ES~All~ and perceptual acuity?
+
+-Regression yields main effect of treatment type (TRAD > BF) but also interaction between treatment type and treatment order. The majority of generalization gains observed seem to be associated with traditional treatment that followed biofeedback treatment. This could be a fluke (with the small number of subjects, random allocation of participants to TRAD-first vs BF-first condition could be skewing outcomes). On the other hand, this outcome is consistent with research and theories of motor learning.
+
+-Patterns of relative response: No conclusive differences; examples of participants who responded to TRAD but not BF treatment (Jack, Adrian), to BF but not TRAD (Emily), or more to BF than to TRAD (Liam, Emma, Madison--but see ceiling effect)
+
+-Discuss within-session gains versus generalization gains. Are these results consistent with the theoretically motivated claim that biofeedback should enhance initial acquisition of a target, while traditional treatment should promote generalization? May need to leave this for a subsequent paper. Comment on generalization and dose.
