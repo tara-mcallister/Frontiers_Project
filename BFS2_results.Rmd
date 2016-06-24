@@ -357,7 +357,7 @@ data3$order_effect <- data3$ESPhase2 - data3$ESPhase1
 ######################################################
 ```
 
-Effect sizes representing change in $\hat{p}_{correct}$ for the treated variant, vocalic /r/, are reported for all participants in Table 3. The first column shows participants' mean $\hat{p}_{correct}$ in the baseline period, averaged across all vocalic /r/ items from all sessions. The second column shows the equivalent mean across the three midpoint sessions, and the third shows the three maintenance sessions. The next three columns report three standardized effect sizes: ES~Phase1~ compares baseline versus midpoint scores, ES~Phase2~ compares midpoint versus maintenance scores, and ES~all~ compares baseline versus maintenance, reflecting overall gains across both phases of treatment. Participants are blocked by the order in which they received treatment (traditional-first or biofeedback-first). **The effect sizes in Table 3 show a wide range of variability in overall response to treatment across individuals. Averaging effect sizes across all participants yields a mean of `r*** round(mean(data3$ESall), digits=2)`, suggesting that on average, participants' response to the combined biofeedback and traditional treatment package was positive and exceeded the minimum value considered clinically significant. Individual patterns of response will be examined in detail in the next section. **
+Effect sizes representing change in $\hat{p}_{correct}$ for the treated variant, vocalic /r/, are reported for all participants in Table 3. The first column shows participants' mean $\hat{p}_{correct}$ in the baseline period, averaged across all vocalic /r/ items from all baseline sessions. The second column shows the equivalent mean across the three midpoint sessions, and the third shows the three maintenance sessions. The next three columns report three standardized effect sizes: ES~Phase1~ compares baseline versus midpoint scores, ES~Phase2~ compares midpoint versus maintenance scores, and ES~all~ compares baseline versus maintenance, reflecting overall gains across both phases of treatment. Participants are blocked by the order in which they received treatment (traditional-first or biofeedback-first). The effect sizes in Table 3 show a wide range of variability in overall response to treatment across individuals. Averaging effect sizes across all participants yields a mean of `r round(mean(data3$ESall), digits=2)`, suggesting that on average, participants' response to the combined biofeedback and traditional treatment package was positive and exceeded the minimum value considered clinically significant. Individual patterns of response will be examined in detail in the next section. 
 
 ```{r, echo=FALSE, fig.width=7, fig.height=2,message=FALSE, warning=FALSE}
 
@@ -728,10 +728,61 @@ for (i in seq_along(Children)){
 
 
 ##Comparison of results across conditions: Effect sizes
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#Read in ES data
+data <- read.csv("cohort2_EF_data.csv")
+str(data)
+
+#Plots of effect sizes
+#Boxplots:
+#Is there an order effect? Boxplot depicting ES~Phase1~ across participants, boxplot depicting ES~Phase2~ across participants
+#boxplot depicting difference between ES~Phase1~ and ES~Phase2~ across participants.
+phasedata <- gather(data,Order, ES, c(ESPhase1, ESPhase2))
+head(phasedata)
+qplot(data=phasedata, x=Order, y=ES, geom="boxplot")
+boxplot(phasedata$order_effect)
+
+#Is there a condition effect? Boxplot depicting BF phase across participants, boxplot depicting TRAD phase across participants
+phasedata <- gather(data,Type, ES, c(ES_TRAD, ES_BF))
+head(phasedata)
+qplot(data=phasedata, x=Type, y=ES, geom="boxplot")
+boxplot(phasedata$BF_advantage)
+
+#########################
+#Effect size correlations
+########################
+
+#Option to run these without Madison, who is an outlier
+#hist(data$ESall)
+#data <- droplevels(data[data$ESall<20,])
+
+#Correlation between ES~All~ and age
+qplot(data=data, x=age_months, y=ESall, geom="point")
+cor.test(data$age_months, data$ESall, type="spearman")
+#NS
+
+#Correlation between ES~All~ and baseline accuracy (participants who start out more accurate tend to gain more)
+qplot(data=data, x=bl1_m, y=ESall, geom="point")
+cor.test(data$bl1_m, data$ESall, type="spearman")
+#NS
+
+#Correlation between ES~All~ and perceptual acuity?
+qplot(data=data, x=ACUITY_F_PRE, y=ESall, geom="point")
+cor.test(data$ACUITY_F_PRE, data$ESall, type="spearman")
+#NS
+
+#Correlation between BF_advantage and perceptual acuity?
+qplot(data=data, x=ACUITY_F_PRE, y=BF_advantage, geom="point")
+cor.test(data$ACUITY_F_PRE, data$ESall, type="spearman")
+#NS
+
+#Correlation between ES~All~ and duration of previous treatment?
+
+```
 
 ###Is there an order effect (ES~Phase1~ > ES~Phase2~, or vice versa?)
 -Boxplot depicting ES~Phase1~ across participants; boxplot depicting ES~Phase2~ across participants; boxplot depicting difference between ES~Phase1~ and ES~Phase2~ across participants.
--Include t-test? (or leave hypothesis-testing to mixed model?)
+
 
 ###Is there an effect of treatment condition (ES~BF~ > ES~TRAD~, or vice versa?)
 -Boxplot depicting ES~BF~ across participants; boxplot depicting ES~TRAD~ across participants; boxplot depicting difference between ES~BF~ and ES~TRAD~ across participants.
@@ -750,7 +801,7 @@ for (i in seq_along(Children)){
 
 ```
 
-In the logistic mixed model described above, treatment condition (TRAD versus BF) was a significant predictor of /r/ production accuracy ((*$\beta$* = `r #pre_b`, *SE* = `r #pre_sd`, , *p* = `r #pre_p`), with the coefficient indicating that the reference level, traditional treatment, was associated with lower accuracy than post-treatment probes. Order of treatment delivery (biofeedback-first versus traditional-first) was not a significant predictor (*$\beta$* = `r #condition_b`, *SE* = `r #condition_sd`, , *p* = `r #condition_p`), but the interaction between treatment type and treatment order was significant (*$\beta$* = `r #int_b`, *SE* = `r #int_sd`, , *p* = `r #int_p`). This interaction can be visualized in Figure 5, which plots accuracy in within-treatment probes (pre- and post-probes) during both biofeedback and traditional treatment conditions; they are pooled across subjects but partitioned by the order of treatment application (BF-first or TRAD-first). Figure 5 shows that accuracy scores tended to be higher in the BF-first order than the TRAD-first order, although this effect was not significant. Furthermore, the main effect of condition (TRAD > BF) appears to be driven heavily by the BF-first group. Complete regression results are reported in On-line Supplement A. FIX: Should use phase designation (phase 1 vs phase 2) instead phase order (BF_TRAD vs TRAD_BF)??
+In the logistic mixed model described above, treatment condition (TRAD versus BF) was a significant predictor of /r/ production accuracy (*$\beta$* = `r #pre_b`, *SE* = `r #pre_sd`, , *p* = `r #pre_p`), with the coefficient indicating that the reference level, traditional treatment, was associated with lower accuracy than post-treatment probes. Order of treatment delivery (biofeedback-first versus traditional-first) was not a significant predictor (*$\beta$* = `r #condition_b`, *SE* = `r #condition_sd`, , *p* = `r #condition_p`), but the interaction between treatment type and treatment order was significant (*$\beta$* = `r #int_b`, *SE* = `r #int_sd`, , *p* = `r #int_p`). This interaction can be visualized in Figure 5, which plots accuracy in within-treatment probes (pre- and post-probes) during both biofeedback and traditional treatment conditions; they are pooled across subjects but partitioned by the order of treatment application (BF-first or TRAD-first). Figure 5 shows that accuracy scores tended to be higher in the BF-first order than the TRAD-first order, although this effect was not significant. Furthermore, the main effect of condition (TRAD > BF) appears to be driven heavily by the BF-first group. Complete regression results are reported in On-line Supplement A. FIX: Should use phase designation (phase 1 vs phase 2) instead phase order (BF_TRAD vs TRAD_BF)??
 
 ```{r, echo=FALSE, fig.width=7, fig.height=2.5,message=FALSE, warning=FALSE}
 #############################################################

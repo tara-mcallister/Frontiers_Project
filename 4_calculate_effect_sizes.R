@@ -210,17 +210,16 @@ str(data2)
 TRAD1 <- droplevels(subset(data2, tx_order=="TRAD_BF"))
 TRAD1$ES_TRAD <- TRAD1$ESPhase1
 TRAD1$ES_BF <- TRAD1$ESPhase2
-
 #Alternatives with across-subjects effect size
-TRAD1$ES_TRAD_AS <- TRAD1$ESPhase1AS
-TRAD1$ES_BF_AS <- TRAD1$ESPhase2AS
+  TRAD1$ES_TRAD_AS <- TRAD1$ESPhase1AS
+  TRAD1$ES_BF_AS <- TRAD1$ESPhase2AS
 
 BF1 <- droplevels(subset(data2, tx_order=="BF_TRAD"))
 BF1$ES_TRAD <- BF1$ESPhase2
 BF1$ES_BF <- BF1$ESPhase1
 #Alternatives with across-subjects effect size
-BF1$ES_TRAD_AS <- BF1$ESPhase2AS
-BF1$ES_BF_AS <- BF1$ESPhase1AS
+  BF1$ES_TRAD_AS <- BF1$ESPhase2AS
+  BF1$ES_BF_AS <- BF1$ESPhase1AS
 
 data3 <- rbind(TRAD1, BF1) 
 
