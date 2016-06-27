@@ -5,6 +5,7 @@ date: "May 9, 2016"
 output: html_document
 ---
 
-Data cleaning was already executed in the file process_xp_BFS2_MERGED.R in C:\Users\tara\Dropbox\R\BFS\Cohort_2. This process has not yet been replicated in the active project folder because it involves complex looping through embedded subfolders. 
+Merging of data (after initial cleaning to eliminate failed raters, null responses, items with <8 trials)
+was executed in the file merge_and_summarize_BFS_FINAL.R in C:\Users\tara\Dropbox\R\BFS. This process has not been replicated in the active project folder because it involves looping through embedded subfolders. 
 
-The cleaned output file is BFS2_trials_summarized.csv. 
+The outputs of the file are BFS2_trials_unsummarized.csv and BFS2_trials_summarized.csv. Both need to be cleaned with 2_clean_data.R.
