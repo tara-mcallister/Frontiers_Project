@@ -375,7 +375,7 @@ for (i in c("Adrian", "Brooklyn", "Emily", "Hailey", "Jack")){
       BL_sessions_3$percent[BL_sessions_3$Subject == i & BL_sessions_3$session == 3] -
           BL_sessions_3$percent[BL_sessions_3$Subject == i & BL_sessions_3$session == 2]))
 }
-BL_sessions_3$diff <- BL_diffs_3
+BL_sessions_3$diff <- abs(BL_diffs_3)
 
 #Calculate differences btw BLs among those with 4 BLs:  Connor, Gabriel, Hannah, Liam
 BL_sessions_4 <- subset(BL_sessions, BL_sessions$Subject == "Connor" | BL_sessions$Subject == "Gabriel" |
@@ -391,7 +391,7 @@ for (i in c("Connor", "Gabriel", "Hannah", "Liam")){
       BL_sessions_4$percent[BL_sessions_4$Subject == i & BL_sessions_4$session == 4] -
           BL_sessions_4$percent[BL_sessions_4$Subject == i & BL_sessions_4$session == 3]))
 }
-BL_sessions_4$diff <- BL_diffs_4
+BL_sessions_4$diff <- abs(BL_diffs_4)
 
 #Calculate differences btw BLs among those with 5 BLs:  Emma, Madison
 BL_sessions_5 <- subset(BL_sessions, BL_sessions$Subject == "Emma" | BL_sessions$Subject == "Madison")
@@ -408,7 +408,7 @@ for (i in c("Emma", "Madison")){
       BL_sessions_5$percent[BL_sessions_5$Subject == i & BL_sessions_5$session == 5] -
           BL_sessions_5$percent[BL_sessions_5$Subject == i & BL_sessions_5$session == 4]))
 }
-BL_sessions_5$diff <- BL_diffs_5
+BL_sessions_5$diff <- abs(BL_diffs_5)
 
 #To calculate mean session-to-session change: calculate the difference for each pair of adjacent sessions (score[session N+1] - score[session N]), sum across all pairs of adjacent sessions, divided by the total number of pairs
 BL_sessions <- rbind(BL_sessions_3, BL_sessions_4, BL_sessions_5)
@@ -433,7 +433,7 @@ for (i in c("Emma", "Madison")){
 
 #1. Mean session-to-session change: calculate the difference for each pair of adjacent sessions (score[session N+1] - score[session N]), sum across all pairs of adjacent sessions, divided by the total number of pairs
 
-c(mean_session_to_session_change_3, mean_session_to_session_change_4, mean_session_to_session_change_5) #1 answer Adrian & Liam stand out
+round(c(mean_session_to_session_change_3, mean_session_to_session_change_4, mean_session_to_session_change_5), digits=2) #1 answer Adrian & Liam stand out
 
 
 #2. Identify any outliers: Points > 2 SD away from the mean across the baseline interval
