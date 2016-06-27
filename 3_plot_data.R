@@ -58,10 +58,13 @@ Children <- levels(data$subject)
 #*creates empty vector to add in missing data*
 missing <- c()
 
+#*creates empty vector to add in missing data*
+session_count <- c()
+
 for (i in seq_along(Children)){
   
   child <- droplevels(data[data$subject==Children[i],])
-  #child <- data[data$subject=="Emily",] 
+  #child <- data[data$subject=="Hannah",] 
   numerical=c(1:length(levels(child$session)))
   minus <- length(numerical) - 2
   labels = levels(child$session)
@@ -69,7 +72,11 @@ for (i in seq_along(Children)){
   
    #*adds missing data for each child to a data frame*
   missing <- rbind(missing, droplevels(child[which(is.na(child$mean)),]))
-  
+
+  #*adds missing data for each child to a data frame*
+  session_count <- rbind(session_count, 
+      ddply(child,.(subject, session, prepost), summarise, count=length(session)))
+    
   BL <- droplevels(subset(child, sessiontype=="BL"))
   nbl <- length(levels(BL$session))
   
@@ -150,4 +157,7 @@ for (i in seq_along(Children)){
 #write.csv(missing, "missing.csv")
 row.names(missing) <- NULL
 missing[c("subject", "session", "word")]
+
+#*write session counts to a data frame*
+write.csv(session_count, "session_count.csv")
 
