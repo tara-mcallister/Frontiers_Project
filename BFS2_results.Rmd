@@ -1,7 +1,7 @@
 ---
 title: "Frontiers paper"
 author: "Tara McAllister Byun and Heather Campbell"
-date: "June 24, 2016"
+date: "June 27, 2016"
 output: pdf_document
 ---
 ```{r, echo=FALSE, include=FALSE, message=FALSE, warning=FALSE}
@@ -205,6 +205,7 @@ nbl <- c()
 bl1_sum <- c()
 bl1_total <- c()
 bl1_perc <- c()
+blall_perc <- c()  ; blall_names <- c() ; blall_sd <- c()   #add these one for BL stabilility measures
 bl1_m <- c()
 bl1_sd <-c()
 for (i in seq_along(Children)){
@@ -213,8 +214,11 @@ for (i in seq_along(Children)){
   bl1_sum <- tapply(child$correct, child$session, sum, na.rm=TRUE)
   bl1_total <- tapply(child$total, child$session, sum, na.rm=TRUE)
   bl1_perc <- bl1_sum*100/bl1_total
+  blall_perc <- c(blall_perc, bl1_perc)   #add this one for BL stabilility measures
+  blall_names <- c(blall_names, rep(Children[i], each= nbl[i]))  
   bl1_m[i] <- mean(bl1_perc)
   bl1_sd[i] <- sd(bl1_perc)
+  blall_sd <- c(blall_sd, rep(bl1_sd[i], each= nbl[i]))  
 }
 
 #Midpoints
@@ -308,11 +312,6 @@ ESPhase2 <- round(ESPhase2, digits=2)
 pooled3 <- round(pooled3, digits=2)
 ESall <- round(ESall, digits=2)
 
-##baseline stability:  Comment on baseline stability: Which participants met the criterion of <10% mean session-to-session variability over the baseline interval? Which participants have demonstrations of noneffect in the baseline phase?**
-BL_variability <- data.frame(subject = Children, baseline_stability = (bl1_sd/bl1_m)*100)
-BL_stable <- subset(BL_variability, BL_variability$baseline_stability < 10)
-BL_stable$subject
-
 data1 <- data.frame(Children, bl1_m, bl1_sd,mp1_m, mp1_sd, mn1_m, mn1_sd, pooled1, ESPhase1, pooled2, ESPhase2, pooled3, ESall)
 colnames(data1)[1] <- "subject" 
 #str(data1)
@@ -358,13 +357,112 @@ library(knitr)
 kable(data3short)  ###These are very close to being in alphabetical order- are they intended to be in order by age?
 ```
 
+```{r, echo=FALSE}
+########## begin BL stability measures
+##baseline stability:  Comment on baseline stability: Which participants met the criterion of <10% mean session-to-session variability over the baseline interval? Which participants have demonstrations of noneffect in the baseline phase?**
+BL_sessions <- data.frame(Subject = blall_names, session = as.numeric(as.factor(names(blall_perc))), percent = blall_perc, sd = blall_sd)
+
+
+#Calculate differences btw BLs among those with 3 BLs:  Adrian, Brooklyn, Emily, Hailey, Jack
+BL_sessions_3 <- subset(BL_sessions, BL_sessions$Subject == "Adrian" | BL_sessions$Subject == "Brooklyn" | BL_sessions$Subject == "Emily" |
+           BL_sessions$Subject == "Hailey" | BL_sessions$Subject == "Jack")
+
+BL_diffs_3 <- c()
+for (i in c("Adrian", "Brooklyn", "Emily", "Hailey", "Jack")){
+  BL_diffs_3 <- c(BL_diffs_3, c(NA, 
+      BL_sessions_3$percent[BL_sessions_3$Subject == i & BL_sessions_3$session == 2] -
+          BL_sessions_3$percent[BL_sessions_3$Subject == i & BL_sessions_3$session == 1], 
+      BL_sessions_3$percent[BL_sessions_3$Subject == i & BL_sessions_3$session == 3] -
+          BL_sessions_3$percent[BL_sessions_3$Subject == i & BL_sessions_3$session == 2]))
+}
+BL_sessions_3$diff <- BL_diffs_3
+
+#Calculate differences btw BLs among those with 4 BLs:  Connor, Gabriel, Hannah, Liam
+BL_sessions_4 <- subset(BL_sessions, BL_sessions$Subject == "Connor" | BL_sessions$Subject == "Gabriel" |
+           BL_sessions$Subject == "Hannah" | BL_sessions$Subject == "Liam")
+
+BL_diffs_4 <- c()
+for (i in c("Connor", "Gabriel", "Hannah", "Liam")){
+  BL_diffs_4 <- c(BL_diffs_4, c(NA, 
+      BL_sessions_4$percent[BL_sessions_4$Subject == i & BL_sessions_4$session == 2] -
+          BL_sessions_4$percent[BL_sessions_4$Subject == i & BL_sessions_4$session == 1],
+      BL_sessions_4$percent[BL_sessions_4$Subject == i & BL_sessions_4$session == 3] -
+          BL_sessions_4$percent[BL_sessions_4$Subject == i & BL_sessions_4$session == 2],
+      BL_sessions_4$percent[BL_sessions_4$Subject == i & BL_sessions_4$session == 4] -
+          BL_sessions_4$percent[BL_sessions_4$Subject == i & BL_sessions_4$session == 3]))
+}
+BL_sessions_4$diff <- BL_diffs_4
+
+#Calculate differences btw BLs among those with 5 BLs:  Emma, Madison
+BL_sessions_5 <- subset(BL_sessions, BL_sessions$Subject == "Emma" | BL_sessions$Subject == "Madison")
+
+BL_diffs_5 <- c()
+for (i in c("Emma", "Madison")){
+  BL_diffs_5 <- c(BL_diffs_5, c(NA, 
+      BL_sessions_5$percent[BL_sessions_5$Subject == i & BL_sessions_5$session == 2] -
+          BL_sessions_5$percent[BL_sessions_5$Subject == i & BL_sessions_5$session == 1],
+      BL_sessions_5$percent[BL_sessions_5$Subject == i & BL_sessions_5$session == 3] -
+          BL_sessions_5$percent[BL_sessions_5$Subject == i & BL_sessions_5$session == 2],
+      BL_sessions_5$percent[BL_sessions_5$Subject == i & BL_sessions_5$session == 4] -
+          BL_sessions_5$percent[BL_sessions_5$Subject == i & BL_sessions_5$session == 3],
+      BL_sessions_5$percent[BL_sessions_5$Subject == i & BL_sessions_5$session == 5] -
+          BL_sessions_5$percent[BL_sessions_5$Subject == i & BL_sessions_5$session == 4]))
+}
+BL_sessions_5$diff <- BL_diffs_5
+
+#To calculate mean session-to-session change: calculate the difference for each pair of adjacent sessions (score[session N+1] - score[session N]), sum across all pairs of adjacent sessions, divided by the total number of pairs
+BL_sessions <- rbind(BL_sessions_3, BL_sessions_4, BL_sessions_5)
+
+sum_diff_3 <- c() ; mean_session_to_session_change_3 <- c()
+for (i in c("Adrian", "Brooklyn", "Emily", "Hailey", "Jack")){
+    sum_diff_3[i] <- sum(BL_sessions$diff[BL_sessions$Subject == i][-1])
+    mean_session_to_session_change_3[i] <- sum_diff_3[i]/2    #divide by total number of pairs
+}
+
+sum_diff_4 <- c() ; mean_session_to_session_change_4 <- c()
+for (i in c("Connor", "Gabriel", "Hannah", "Liam")){
+    sum_diff_4[i] <- sum(BL_sessions$diff[BL_sessions$Subject == i][-1])
+    mean_session_to_session_change_4[i] <- sum_diff_4[i]/3    #divide by total number of pairs
+}
+
+sum_diff_5 <- c() ; mean_session_to_session_change_5 <- c()
+for (i in c("Emma", "Madison")){
+    sum_diff_5[i] <- sum(BL_sessions$diff[BL_sessions$Subject == i][-1])
+    mean_session_to_session_change_5[i] <- sum_diff_5[i]/4    #divide by total number of pairs
+  }
+
+#1. Mean session-to-session change: calculate the difference for each pair of adjacent sessions (score[session N+1] - score[session N]), sum across all pairs of adjacent sessions, divided by the total number of pairs
+
+c(mean_session_to_session_change_3, mean_session_to_session_change_4, mean_session_to_session_change_5) #1 answer Adrian & Liam stand out
+
+
+#2. Identify any outliers: Points > 2 SD away from the mean across the baseline interval
+high <- c(); low <- c()
+for (i in Children){
+  i <- subset(BL_sessions, Subject == i)
+  high <- rbind(high, subset(i, i$percent > (mean(i$percent) + 2*sd(i$percent))))
+  low <- rbind(low, subset(i, i$percent < (mean(i$percent) - 2*sd(i$percent))))
+}
+rbind(high, low)  #2 answer:  no outliers
+
+
+#3. Identify any baseline phases that end on a rising trend: last 3 datapoints show a monotonic increase with a magnitude that is greater than the baseline SD
+rising <- c()
+for (i in Children){
+  i <- subset(BL_sessions, Subject == i)
+  rising <- rbind(rising, subset(i, i$diff > i$sd))
+}
+rising   #3 answer:  no participant showed last 3 session diff greater than sd
+########## end BL stability measures
+```
+
 ##Individual results: Visual inspection
 
 Figures 2-4 represent each participant's pattern of change in accuracy ($\hat{p}_{correct}$) over time, which can be visually inspected to corroborate the effect sizes reported in Table 3. Discussion of differences in relative response to biofeedback versus traditional treatment will be deferred until the next section, which reports the results of individual randomization tests. In the single-subject plots in Figures 2-4, each child is represented by two boxes. The top box reflects performance on probe measures administered before and after each biofeedback treatment session and additionally reports probe scores from the pre-treatment baseline and post-treatment maintenance periods (shaded gray). The lower box reflects performance during traditional treatment sessions. Recall that sessions were randomly assigned to feature biofeedback or traditional treatment, but in a blocked fashion so that a participant experienced no more than two consecutive sessions of the same type. For each treatment session, a black circle represents performance on the pre-treatment probe measure, and a red star represents performance on the post-treatment probe. The y-axis represents $\hat{p}_{correct}$ aggregated across all vocalic /r/ items within a session; that is, the total number of "correct /r/" ratings as a percentage of the total number of ratings collected. Thus, the distance between the circle and the star within a session provide an index of the participant's progress (or lack thereof) during that treatment session. Finally, a dashed horizontal line tracks the participant's mean $\hat{p}_{correct}$ from the baseline interval, so that subsequent scores can be compared to the baseline mean. 
 
 The mean number of probe words on which $\hat{p}_{correct}$ scores are based was `r round(mPREPOST, digits=2)` (SD = `r round(sdPREPOST, digits=2)`) for pre- and post-treatment probes and ###`r mBLMN` (SD = `r sdBLMN`) for baseline and maintenance probes. The number of ratings collected in connection with a given probe session (i.e., the denominator in $\hat{p}_{correct}$) was roughly nine times the number of items in that probe and often was larger.
 
-For convenience, the single-subject graphs have been grouped into three sets of 3-4 participants who demonstrated broadly similar patterns of response to treatment. Figure 2 depicts four participants for whom visual inspection provided strong evidence of a response to at least one type of treatment, and Figure 3 shows three participants for whom visual inspection provided moderate support of a response to treatment. Finally, Figure 3 shows four participants who showed no reliable evidence of a response to treatment. The participants in each group are discussed in detail below. **Comment on baseline stability: Which participants met the criterion of <10% mean session-to-session variability over the baseline interval? Which participants have demonstrations of noneffect in the baseline phase?** Those participants who met the criterion of <10% mean session-to-session variability (calculated as the baseline standard deviation divided by the baseline mean) were `r BL_stable$subject`. 
+For convenience, the single-subject graphs have been grouped into three sets of 3-4 participants who demonstrated broadly similar patterns of response to treatment. Figure 2 depicts four participants for whom visual inspection provided strong evidence of a response to at least one type of treatment, and Figure 3 shows three participants for whom visual inspection provided moderate support of a response to treatment. Finally, Figure 3 shows four participants who showed no reliable evidence of a response to treatment. The participants in each group are discussed in detail below. **Comment on baseline stability: Which participants met the criterion of <10% mean session-to-session variability over the baseline interval? Which participants have demonstrations of noneffect in the baseline phase?** ##All participants met the criterion of <10% mean session-to-session variability, with the highest variability from Adrian (`r round(mean_session_to_session_change_3[1], digits=2)`) and Liam (`r round(mean_session_to_session_change_4[4], digits=2)`). There were no outlier baseline sessions that exceeded 2 standard deviations from the mean BL percentage for each participant. Finally, no particpant showed a rising trend in baseline sessions, as the percentage differences between the last 3 baseline sessions for each participant did not exceed the standard deviation for that participant. ###
 
 Visual inspection of data from `r paste(demog$age_enrollment_years[demog$subject=="Adrian"], demog$age_enrollment_months[demog$subject=="Adrian"], sep=";")` year-old Adrian shows a large change in level between the baseline phase and all subsequent phases of treatment, with minimal overlap between observations in the baseline phase and any subsequent phase. This change occurred immediately after the initiation of treatment. Adrian's progress in the first phase, which featured traditional articulatory treatment, yielded a large ES~Phase1~ of `r data3$ESPhase1[data3$subject=="Adrian"]`. His performance declined slightly in the second phase, which featured biofeedback treatment, yielding an ES~Phase2~ of `r data3$ESPhase2[data3$subject=="Adrian"]` from midpoint to maintenance. However, his performance still remained substantially above baseline levels, with a final ES~All~ of `r data3short[1,10]`. **Is unstable baseline a threat to internal validity?**
 
