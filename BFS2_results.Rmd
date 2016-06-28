@@ -268,7 +268,7 @@ pooled1a <- sqrt(((nbl-1)*(bl1_sd^2) + (nmp-1)*(mp1_sd^2))/(nbl+nmp-2))
       divide_by(nbl+nmp-2) %>%
       raise_to_power(1/2)
     #Check that they yield the same output
-    pooled1a==pooled1
+    #pooled1a==pooled1
 #Effect size = mean level difference divided by pooled SD
 ESPhase1 <- (mp1_m - bl1_m)/pooled1
 
@@ -281,7 +281,7 @@ pooled2a <- sqrt(((nmp-1)*(mp1_sd^2) + (nmn-1)*(mn1_sd^2))/(nmp+nmn-2))
       divide_by(nmp+nmn-2) %>%
       raise_to_power(1/2)
     #Check that they yield the same output
-    pooled2a==pooled2
+    #pooled2a==pooled2
 #Effect size = mean level difference divided by pooled SD
 ESPhase2 <- (mn1_m - mp1_m)/pooled2
 
@@ -294,7 +294,7 @@ pooled3a <- sqrt(((nbl-1)*(bl1_sd^2) + (nmn-1)*(mn1_sd^2))/(nbl+nmn-2))
       divide_by(nbl+nmn-2) %>%
       raise_to_power(1/2)
     #Check that they yield the same output
-    pooled3a==pooled3
+    #pooled3a==pooled3
 #Effect size = mean level difference divided by pooled SD
 ESall <- (mn1_m - bl1_m)/pooled3
 
@@ -472,7 +472,7 @@ Emma, age `r paste(demog$age_enrollment_years[demog$subject=="Emma"], demog$age_
 Participants Liam, age `r paste(demog$age_enrollment_years[demog$subject=="Liam"], demog$age_enrollment_months[demog$subject=="Liam"], sep=";")`, and Madison, age `r paste(demog$age_enrollment_years[demog$subject=="Madison"], demog$age_enrollment_months[demog$subject=="Madison"], sep=";")`, exhibited similar trajectories of progress, although Madison showed higher overall accuracy throughout the study. Like Emma, both boys began in the biofeedback treatment condition and began to show gains within the first three sessions of treatment; they sustained their gains during midpoint probes and made additional improvements in the second phase of treatment. They likewise showed no overlap between the baseline phase and data points in the midpoint phase, second phase of treatment, or maintenance phase. In Madison's case, there also was very little overlap between the baseline phase and the first phase of treatment. For both boys, a larger effect size was calculated for the first phase of treatment, in which biofeedback was provided, although this could be attributed to a ceiling effect in Madison's case. Large overall effect sizes of `r data3$ESall[data3$subject=="Liam"]` and `r data3$ESall[data3$subject=="Madison"]` were observed for Liam and Madison, respectively. **Demonstration of noneffect: trend in Liam's baseline data?** **What is going on with Madison's tx2 pre-probe? Might there be missing data?**
 
 
-```{r, echo=FALSE, fig.width=7, fig.height=2,message=FALSE, warning=FALSE,strip.white=TRUE}
+```{r, echo=FALSE, fig.width=7, fig.height=5,message=FALSE, warning=FALSE,strip.white=TRUE}
 #################################################################
 #FIGURE 2: POSITIVE EFFECT SIZES
 #################################################################
@@ -491,7 +491,7 @@ data <- droplevels(filter(data, subject=="Adrian"|subject=="Liam"|subject=="Emma
 
 #Specs for plotting
 par(mfrow=c(3,1))
-par(mar = c(.1, .1, .1, .1))
+par(mar = c(2.5, 2.5, 2.5, 2.5))
 par(xpd=FALSE)
 
 #Loop through participants
@@ -544,7 +544,7 @@ for (i in seq_along(Children)){
   beginMP <- endBL + 10
   endMP <- beginMP + 3
   beginMN <- endMP + 10
-  endMN <- beginMN + 3
+  endMN <- beginMN + 3.6
   color <- rgb(190, 190, 190, alpha=80, maxColorValue=255)
   rect(xleft=0.0-1, xright=endBL, ybottom=-4, ytop=106, density=100, 
        col=color)
@@ -574,9 +574,9 @@ for (i in seq_along(Children)){
   #*Place a legend based on mean rating of MN sessions*
   ifelse(mean(rev(BF_pre_percent)[1:3]) <= 50, 
          legend("topright",cex=.9, legend = c("Pre BF", "Post BF","Pre Trad", "Post Trad"), 
-                pch = c(1,1,12,6), col=c("black","red", "blue","green"), bg = "white"), 
+                pch = c(1,8,12,6), col=c("black","red", "blue","green"), bg = "white"), 
          legend("bottomright" ,cex=.9, legend = c("Pre BF", "Post BF","Pre Trad", "Post Trad"), 
-                pch = c(1,1,12,6), col=c("black","red", "blue","green"), bg = "white"))
+                pch = c(1,8,12,6), col=c("black","red", "blue","green"), bg = "white"))
   
 }
 
@@ -591,7 +591,7 @@ Participant Jack, age `r paste(demog$age_enrollment_years[demog$subject=="Jack"]
 
 Participant Gabriel, age `r paste(demog$age_enrollment_years[demog$subject=="Gabriel"], demog$age_enrollment_months[demog$subject=="Gabriel"], sep=";")`, showed a small increase in the perceptually rated accuracy of rhotics produced during Phase 1, followed by a slightly larger increase during Phase 2. Ongoing overlap in data points between baseline and treatment phases prevents us from attaching a strong interpretation to these data, and gains were minimally sustained into the midpoint and maintenance probe intervals. All three effect sizes computed for Gabriel fell short of the threshold to be considered clinically significant (ES~Phase1~: `r data3$ESPhase1[data3$subject=="Gabriel"]`; ES~Phase2~: `r data3$ESPhase2[data3$subject=="Gabriel"]`; ES~All~: `r data3$ESall[data3$subject=="Gabriel"]`). On the other hand, Gabriel's accuracy during both phases of treatment was much more variable than at baseline. This suggested that he was engaging some degree of exploration of new strategies for rhotic production, although he had not yet stabilized a production pattern that would reliably yield a perceptually accurate rhotic sound.
 
-```{r, echo=FALSE, fig.width=7, fig.height=2,message=FALSE, warning=FALSE}
+```{r, echo=FALSE, fig.width=7, fig.height=5,message=FALSE, warning=FALSE}
 #################################################################
 #FIGURE 3: SMALL POSITIVE EFFECT SIZES
 #################################################################
@@ -610,7 +610,7 @@ data <- droplevels(filter(data, subject=="Emily"|subject=="Jack"|subject=="Gabri
 
 #Specs for plotting
 par(mfrow=c(3,1))
-par(mar = c(.1, .1, .1, .1))
+par(mar = c(2.5, 2.5, 2.5, 2.5))
 par(xpd=FALSE)
 
 #Loop through participants
@@ -663,7 +663,7 @@ for (i in seq_along(Children)){
   beginMP <- endBL + 10
   endMP <- beginMP + 3
   beginMN <- endMP + 10
-  endMN <- beginMN + 3
+  endMN <- beginMN + 3.6
   color <- rgb(190, 190, 190, alpha=80, maxColorValue=255)
   rect(xleft=0.0-1, xright=endBL, ybottom=-4, ytop=106, density=100, 
        col=color)
@@ -693,9 +693,9 @@ for (i in seq_along(Children)){
   #*Place a legend based on mean rating of MN sessions*
   ifelse(mean(rev(BF_pre_percent)[1:3]) <= 50, 
          legend("topright",cex=.9, legend = c("Pre BF", "Post BF","Pre Trad", "Post Trad"), 
-                pch = c(1,1,12,6), col=c("black","red", "blue","green"), bg = "white"), 
+                pch = c(1,8,12,6), col=c("black","red", "blue","green"), bg = "white"), 
          legend("bottomright" ,cex=.9, legend = c("Pre BF", "Post BF","Pre Trad", "Post Trad"), 
-                pch = c(1,1,12,6), col=c("black","red", "blue","green"), bg = "white"))
+                pch = c(1,8,12,6), col=c("black","red", "blue","green"), bg = "white"))
   
 }
 
@@ -706,7 +706,7 @@ for (i in seq_along(Children)){
 Finally, Figure 4 depicts the four participants for whom visual inspection of generalization probe data yielded no significant evidence of a response to either type of treatment. Three of these participants (Brooklyn, Hailey, and Hannah) began treatment in the traditional treatment condition, while one participant (Connor) received treatment in the opposite order. Across all of these participants, visual inspection of perceptual rating data yields a consistent picture of minimal change across all phases of the study. Effect sizes are generally in accordance with visual inspection; an exception is Connor's ES~Phase1~ of `r data3$ESPhase1[data3$subject=="Connor"]`, but this value is inflated by minimal variance during the baseline phase. Note also that most participants in this group had near-zero perceptual accuracy ratings at baseline, contrasting with the more intermediate accuracy ratings given to participants in the other groups; we return to this topic in the discussion section.
 
 
-```{r, echo=FALSE, fig.width=7, fig.height=2,message=FALSE, warning=FALSE}
+```{r, echo=FALSE, fig.width=7, fig.height=5, message=FALSE, warning=FALSE}
 #################################################################
 #FIGURE 3: NULL EFFECT SIZES
 #################################################################
@@ -725,7 +725,7 @@ data <- droplevels(filter(data, subject=="Brooklyn"|subject=="Hailey"|subject=="
 
 #Specs for plotting
 par(mfrow=c(3,1))
-par(mar = c(.1, .1, .1, .1))
+par(mar = c(2.5, 2.5, 2.5, 2.5))
 par(xpd=FALSE)
 
 #Loop through participants
@@ -778,7 +778,7 @@ for (i in seq_along(Children)){
   beginMP <- endBL + 10
   endMP <- beginMP + 3
   beginMN <- endMP + 10
-  endMN <- beginMN + 3
+  endMN <- beginMN + 3.6
   color <- rgb(190, 190, 190, alpha=80, maxColorValue=255)
   rect(xleft=0.0-1, xright=endBL, ybottom=-4, ytop=106, density=100, 
        col=color)
@@ -808,9 +808,9 @@ for (i in seq_along(Children)){
   #*Place a legend based on mean rating of MN sessions*
   ifelse(mean(rev(BF_pre_percent)[1:3]) <= 50, 
          legend("topright",cex=.9, legend = c("Pre BF", "Post BF","Pre Trad", "Post Trad"), 
-                pch = c(1,1,12,6), col=c("black","red", "blue","green"), bg = "white"), 
+                pch = c(1,8,12,6), col=c("black","red", "blue","green"), bg = "white"), 
          legend("bottomright" ,cex=.9, legend = c("Pre BF", "Post BF","Pre Trad", "Post Trad"), 
-                pch = c(1,1,12,6), col=c("black","red", "blue","green"), bg = "white"))
+                pch = c(1,8,12,6), col=c("black","red", "blue","green"), bg = "white"))
   
 }
 
@@ -820,23 +820,24 @@ for (i in seq_along(Children)){
 
 
 ##Comparison of results across conditions: Effect sizes
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height=5, fig.width=7}
 #Read in ES data
 data <- read.csv("cohort2_EF_data.csv")
-str(data)
+#str(data)
 
 #Plots of effect sizes
 #Boxplots:
 #Is there an order effect? Boxplot depicting ES~Phase1~ across participants, boxplot depicting ES~Phase2~ across participants
 #boxplot depicting difference between ES~Phase1~ and ES~Phase2~ across participants.
 phasedata <- gather(data,Order, ES, c(ESPhase1, ESPhase2))
-head(phasedata)
+#head(phasedata)
+
 qplot(data=phasedata, x=Order, y=ES, geom="boxplot")
 boxplot(phasedata$order_effect)
 
 #Is there a condition effect? Boxplot depicting BF phase across participants, boxplot depicting TRAD phase across participants
 phasedata <- gather(data,Type, ES, c(ES_TRAD, ES_BF))
-head(phasedata)
+#head(phasedata)
 qplot(data=phasedata, x=Type, y=ES, geom="boxplot")
 boxplot(phasedata$BF_advantage)
 
@@ -892,28 +893,28 @@ cor.test(data$ACUITY_F_PRE, data$ESall, type="spearman")
 #############################################################
 #Read in unmerged data
 unmergeddata <- read.csv("clean_data_unsummarized.csv")
-str(unmergeddata)
-dim(unmergeddata)
+#str(unmergeddata)
+#dim(unmergeddata)
 
 #Now fit logistic regression
 #Because we will be comparing phase 1 and phase 2, use only treatment data
 dataTX <- droplevels(unmergeddata[unmergeddata$condition!="PROBE",])
-dim(dataTX)
-levels(dataTX$condition)
+#dim(dataTX)
+#levels(dataTX$condition)
 #Code by order
 dataTX$phase <- 0
 TRAD1 <- droplevels(subset(dataTX, tx_order=="TRAD_BF"))
 TRAD1[which(TRAD1$condition=="Trad"),]$phase <- 1
 TRAD1[which(TRAD1$condition=="BF"),]$phase <- 2
-head(TRAD1)
+#head(TRAD1)
 table(TRAD1$phase)
 BF1 <- droplevels(subset(dataTX, tx_order=="BF_TRAD"))
 BF1[which(BF1$condition=="BF"),]$phase <- 1
 BF1[which(BF1$condition=="Trad"),]$phase <- 2
 
 mydataTX <- rbind(TRAD1, BF1) 
-table(mydataTX$phase)
-str(mydataTX)
+#table(mydataTX$phase)
+#str(mydataTX)
 
 #This model, including an interaction between condition and raw phase order, does not converge
 #mymodfull <- glmer(response ~ condition*phase + (condition|subject) + (1|Word) + (1|userCode), data=mydataTX, family="binomial")
@@ -933,9 +934,15 @@ sumdataTX$phat <- 100*sumdataTX$sum/100*sumdataTX$total
 p1 <- qplot(x = tx_order, y = phat, fill = condition, data=sumdataTX, geom="boxplot")
 p1
 
+#df to call specific fixed effects in the text
+coeff <- round(summary(mymod)$coeff, digits=2)
+
+#df if needing to call specific random slopes/effects in the text
+rand <- data.frame(summary(mymod)$varcor) 
+rand[4:5] <- round(rand[4:5], digits=2)
 ```
 
-In the logistic mixed model described above, neither treatment condition (TRAD versus BF) nor order of treatment delivery was a significant predictor of /r/ production accuracy. However, the interaction between treatment type and treatment order was significant (*$\beta$* = `r #COEF`, *SE* = `r #COEF`, , *p* = `r #COEF`). This interaction can be visualized in Figure 5, which plots accuracy in within-treatment probes (pre- and post-probes) during both biofeedback and traditional treatment conditions; they are pooled across subjects but partitioned by the order of treatment application (BF-first or TRAD-first). Figure 5 also shows that accuracy scores tended to be higher in the BF-first order than the TRAD-first order, although this effect was not significant (*$\beta$* = `r #COEF`, *SE* = `r #COEF`, , *p* = `r #COEF`). Complete regression results are reported in On-line Supplement A. FIX: Should use phase designation (phase 1 vs phase 2) instead phase order (BF_TRAD vs TRAD_BF)?? ANSWER: No, that model does not converge with random slopes included; this model is a better alternative.
+In the logistic mixed model described above, neither treatment condition (TRAD versus BF) nor order of treatment delivery was a significant predictor of /r/ production accuracy. However, the interaction between treatment type and treatment order was significant (*$\beta$* = `r coeff[4,1]`, *SE* = `r coeff[4,2]`, *p* = `r coeff[4,4]`). This interaction can be visualized in Figure 5, which plots accuracy in within-treatment probes (pre- and post-probes) during both biofeedback and traditional treatment conditions; they are pooled across subjects but partitioned by the order of treatment application (BF-first or TRAD-first). Figure 5 also shows that accuracy scores tended to be higher in the BF-first order than the TRAD-first order, although this effect was not significant (*$\beta$* = `r coeff[3,1]`, *SE* = `r coeff[3,2]`, , *p* = `r coeff[3,4]`). Complete regression results are reported in On-line Supplement A. FIX: Should use phase designation (phase 1 vs phase 2) instead phase order (BF_TRAD vs TRAD_BF)?? ANSWER: No, that model does not converge with random slopes included; this model is a better alternative.
 
 ```{r, echo=FALSE, fig.width=7, fig.height=2.5,message=FALSE, warning=FALSE}
 #############################################################
