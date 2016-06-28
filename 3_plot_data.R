@@ -32,7 +32,7 @@ data$session = ordered(data$session, levels = c("BL1","BL2","BL3","BL4","BL5","T
     #and the items occurring under 100 times are BLMN only.
     both <- droplevels(tab2[which(tab2$freq>300),])
     primary <- levels(both$word)
-    only <- droplevels(tab2[which(tab2$freq<100),])
+    only <- droplevels(tab2[which(tab2$freq<150),])
     generalization <- levels(only$word)
     
     #Option to reduce to only primary words
