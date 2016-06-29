@@ -939,11 +939,7 @@ sumdataTX <- dataTX %>%
   dplyr::group_by(subject, condition, tx_order) %>%
     dplyr::summarise(sum=sum(response), total=length(response))
 
-#I think order of operations says that this is just multiplying sumdataTX$sum by sumdataTX$total:
-#sumdataTX$phat <- 100*sumdataTX$sum/100*sumdataTX$total    #error????
-
 sumdataTX$phat <- 100*(sumdataTX$sum/sumdataTX$total)
-
 
 head(sumdataTX)
 sumdataTX$tx_order_plot <- mapvalues(sumdataTX$tx_order, from = c("BF_TRAD", "TRAD_BF"), 
@@ -952,7 +948,7 @@ sumdataTX$Condition <- mapvalues(sumdataTX$condition, from = c("BF", "Trad"),
                                      to = c("Biofeedback", "Traditional"))
 
 p1 <- qplot(x = tx_order_plot, y = phat, fill = Condition, data = sumdataTX, geom = "boxplot", 
-            main = expression(paste(hat(p), ' Treatment Accuracy by Treatment Order')), xlab = "Treatment Order", ylab = expression(hat(p)))
+            main = expression(paste(hat(p), ' Accuracy by Treatment Order and Condition')), xlab = "Treatment Order", ylab = expression(hat(p)))
 p1
 
 #df to call specific fixed effects in the text
