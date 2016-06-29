@@ -29,7 +29,9 @@ library(tidyr)
 
 ```{r, echo=FALSE, include=FALSE, message=FALSE, warning=FALSE}
 ################################################################
-#THIS CODE LOADS AND CLEANS DATA 
+#WARNING!!!!!   THIS CODE LOADS AND CLEANS DATA 
+###Warning!! This code is currently not active because it's not writing a version of new clean data!!!!!!
+
 #################################################################
 
 data  = read.csv("BFS2_trials_summarized", sep="\t", header=T)
@@ -131,7 +133,7 @@ data$subject <- as.factor(data$subject)
 data$session = ordered(data$session, levels = c("BL1","BL2","BL3","BL4","BL5","TX1","TX2","TX3","TX4","TX5","TX6","TX7","TX8","TX9","TX10",
                                                 "MP1","MP2","MP3","TX11","TX12",
                                                 "TX13","TX14","TX15","TX16","TX17","TX18","TX19","TX20","MN1","MN2","MN3"))   
-
+#rewrite with new participant names
 #Uncomment this if you want to generate the summarized data file anew
 #write.csv(data, "clean_data.csv")
 ```
@@ -143,6 +145,7 @@ data$session = ordered(data$session, levels = c("BL1","BL2","BL3","BL4","BL5","T
 #THIS CODE CALCULATES EFFECT SIZES
 #################################################################
 data <- read.csv("clean_data.csv")
+
 #Check that variables are of correct types
 #str(data)
 data$subject_number <- as.factor(data$subject_number)
@@ -298,7 +301,6 @@ pooled3a <- sqrt(((nbl-1)*(bl1_sd^2) + (nmn-1)*(mn1_sd^2))/(nbl+nmn-2))
 #Effect size = mean level difference divided by pooled SD
 ESall <- (mn1_m - bl1_m)/pooled3
 
-
 bl1_m <- round(bl1_m, digits=2)
 bl1_sd <- round(bl1_sd, digits=2)
 mp1_m <- round(mp1_m, digits=2)
@@ -322,6 +324,16 @@ demog$subject <- as.factor(demog$subject)
 data2 <- left_join(data1, demog, by="subject")
 data2$subject <- as.factor(data2$subject)
 #str(data2)
+
+#change psuedonyms to pseudo-pseudonyms
+data2$originalpseudonym <- data2$subject
+data2$subject <- mapvalues(data2$originalpseudonym, from = c("Adrian", "Brooklyn", "Connor", "Emily", 
+                                                           "Emma", "Gabriel",  "Hailey", "Hannah", 
+                                                           "Jack", "Liam", "Madison"), 
+                          to = c("Aiden", "Bryce", "Cooper", "Erica", 
+                                 "Ella", "Gregory",  "Holly", "Harper", 
+                                 "Jason", "Landon", "Mason"))
+
 
 #Code by treatment type
 TRAD1 <- droplevels(subset(data2, tx_order=="TRAD_BF"))
@@ -362,14 +374,19 @@ kable(data3short)  ###These are very close to being in alphabetical order- are t
 ########## begin BL stability measures
 ##baseline stability:  Comment on baseline stability: Which participants met the criterion of <10% mean session-to-session variability over the baseline interval? Which participants have demonstrations of noneffect in the baseline phase?**
 BL_sessions <- data.frame(Subject = blall_names, session = as.numeric(as.factor(names(blall_perc))), percent = blall_perc, sd = blall_sd)
-
+BL_sessions$Subject <- mapvalues(BL_sessions$Subject, from = c("Adrian", "Brooklyn", "Connor", "Emily", 
+                                                           "Emma", "Gabriel",  "Hailey", "Hannah", 
+                                                           "Jack", "Liam", "Madison"), 
+                          to = c("Aiden", "Bryce", "Cooper", "Erica", 
+                                 "Ella", "Gregory",  "Holly", "Harper", 
+                                 "Jason", "Landon", "Mason"))
 
 #Calculate differences btw BLs among those with 3 BLs:  Adrian, Brooklyn, Emily, Hailey, Jack
-BL_sessions_3 <- subset(BL_sessions, BL_sessions$Subject == "Adrian" | BL_sessions$Subject == "Brooklyn" | BL_sessions$Subject == "Emily" |
-           BL_sessions$Subject == "Hailey" | BL_sessions$Subject == "Jack")
+BL_sessions_3 <- subset(BL_sessions, BL_sessions$Subject == "Aiden" | BL_sessions$Subject == "Bryce" | 
+                          BL_sessions$Subject == "Erica" | BL_sessions$Subject == "Holly" | BL_sessions$Subject == "Jason")
 
 BL_diffs_3 <- c()
-for (i in c("Adrian", "Brooklyn", "Emily", "Hailey", "Jack")){
+for (i in c("Aiden", "Bryce", "Erica", "Holly", "Jason")){
   BL_diffs_3 <- c(BL_diffs_3, c(NA, 
       BL_sessions_3$percent[BL_sessions_3$Subject == i & BL_sessions_3$session == 2] -
           BL_sessions_3$percent[BL_sessions_3$Subject == i & BL_sessions_3$session == 1], 
@@ -379,11 +396,11 @@ for (i in c("Adrian", "Brooklyn", "Emily", "Hailey", "Jack")){
 BL_sessions_3$diff <- abs(BL_diffs_3)
 
 #Calculate differences btw BLs among those with 4 BLs:  Connor, Gabriel, Hannah, Liam
-BL_sessions_4 <- subset(BL_sessions, BL_sessions$Subject == "Connor" | BL_sessions$Subject == "Gabriel" |
-           BL_sessions$Subject == "Hannah" | BL_sessions$Subject == "Liam")
+BL_sessions_4 <- subset(BL_sessions, BL_sessions$Subject == "Cooper" | BL_sessions$Subject == "Gregory" |
+           BL_sessions$Subject == "Harper" | BL_sessions$Subject == "Landon")
 
 BL_diffs_4 <- c()
-for (i in c("Connor", "Gabriel", "Hannah", "Liam")){
+for (i in c("Cooper", "Gregory", "Harper", "Landon")){
   BL_diffs_4 <- c(BL_diffs_4, c(NA, 
       BL_sessions_4$percent[BL_sessions_4$Subject == i & BL_sessions_4$session == 2] -
           BL_sessions_4$percent[BL_sessions_4$Subject == i & BL_sessions_4$session == 1],
@@ -395,10 +412,10 @@ for (i in c("Connor", "Gabriel", "Hannah", "Liam")){
 BL_sessions_4$diff <- abs(BL_diffs_4)
 
 #Calculate differences btw BLs among those with 5 BLs:  Emma, Madison
-BL_sessions_5 <- subset(BL_sessions, BL_sessions$Subject == "Emma" | BL_sessions$Subject == "Madison")
+BL_sessions_5 <- subset(BL_sessions, BL_sessions$Subject == "Ella" | BL_sessions$Subject == "Mason")
 
 BL_diffs_5 <- c()
-for (i in c("Emma", "Madison")){
+for (i in c("Ella", "Mason")){
   BL_diffs_5 <- c(BL_diffs_5, c(NA, 
       BL_sessions_5$percent[BL_sessions_5$Subject == i & BL_sessions_5$session == 2] -
           BL_sessions_5$percent[BL_sessions_5$Subject == i & BL_sessions_5$session == 1],
@@ -415,31 +432,30 @@ BL_sessions_5$diff <- abs(BL_diffs_5)
 BL_sessions <- rbind(BL_sessions_3, BL_sessions_4, BL_sessions_5)
 
 sum_diff_3 <- c() ; mean_session_to_session_change_3 <- c()
-for (i in c("Adrian", "Brooklyn", "Emily", "Hailey", "Jack")){
+for (i in c("Aiden", "Bryce", "Erica", "Holly", "Jason")){
     sum_diff_3[i] <- sum(BL_sessions$diff[BL_sessions$Subject == i][-1])
     mean_session_to_session_change_3[i] <- sum_diff_3[i]/2    #divide by total number of pairs
 }
 
 sum_diff_4 <- c() ; mean_session_to_session_change_4 <- c()
-for (i in c("Connor", "Gabriel", "Hannah", "Liam")){
+for (i in c("Cooper", "Gregory", "Harper", "Landon")){
     sum_diff_4[i] <- sum(BL_sessions$diff[BL_sessions$Subject == i][-1])
     mean_session_to_session_change_4[i] <- sum_diff_4[i]/3    #divide by total number of pairs
 }
 
 sum_diff_5 <- c() ; mean_session_to_session_change_5 <- c()
-for (i in c("Emma", "Madison")){
+for (i in c("Ella", "Mason")){
     sum_diff_5[i] <- sum(BL_sessions$diff[BL_sessions$Subject == i][-1])
     mean_session_to_session_change_5[i] <- sum_diff_5[i]/4    #divide by total number of pairs
   }
 
 #1. Mean session-to-session change: calculate the difference for each pair of adjacent sessions (score[session N+1] - score[session N]), sum across all pairs of adjacent sessions, divided by the total number of pairs
 
-round(c(mean_session_to_session_change_3, mean_session_to_session_change_4, mean_session_to_session_change_5), digits=2) #1 answer Adrian & Liam stand out
-
+round(c(mean_session_to_session_change_3, mean_session_to_session_change_4, mean_session_to_session_change_5), digits=2) #1 #answer Emma, Adrian & Liam stand out
 
 #2. Identify any outliers: Points > 2 SD away from the mean across the baseline interval
 high <- c(); low <- c()
-for (i in Children){
+for (i in data3$subject){
   i <- subset(BL_sessions, Subject == i)
   high <- rbind(high, subset(i, i$percent > (mean(i$percent) + 2*sd(i$percent))))
   low <- rbind(low, subset(i, i$percent < (mean(i$percent) - 2*sd(i$percent))))
@@ -448,12 +464,23 @@ rbind(high, low)  #2 answer:  no outliers
 
 
 #3. Identify any baseline phases that end on a rising trend: last 3 datapoints show a monotonic increase with a magnitude that is greater than the baseline SD
-rising <- c()
-for (i in Children){
+#originally interpreted as session-session rise exceeding sd:
+rising_session <- c()
+for (i in data3$subject){
   i <- subset(BL_sessions, Subject == i)
-  rising <- rbind(rising, subset(i, i$diff > i$sd))
+  rising_session <- rbind(rising_session, subset(i, i$diff > i$sd))
 }
-rising   #3 answer:  no participant showed last 3 session diff greater than sd
+rising_session   #3a answer:  Emma & Hannah showed last 3 session diff greater than sd
+
+#does the sum of the rise in final 3 sessions exceed the sd?
+rising <- c()
+for (i in data3$subject){
+  i <- subset(BL_sessions, Subject == i)
+  i <- subset(i, session == tail(sort(i$session), 3)[1] | session == tail(sort(i$session), 3)[2] | session == tail(sort(i$session), 3)[3])
+  rising <- rbind(rising, subset(i, (max(i$percent) - min(i$percent)) > i$sd))
+}
+rising  #3b:  Yes, for all participants, the max-min diff in the 3 final sessions exceeds the sd, only for Adrian and Emma does it appear to be a monotonic increase
+
 ########## end BL stability measures
 ```
 
@@ -463,13 +490,13 @@ Figures 2-4 represent each participant's pattern of change in accuracy ($\hat{p}
 
 The mean number of probe words on which $\hat{p}_{correct}$ scores are based was `r round(mPREPOST, digits=2)` (SD = `r round(sdPREPOST, digits=2)`) for pre- and post-treatment probes and ###`r mBLMN` (SD = `r sdBLMN`) for baseline and maintenance probes. The number of ratings collected in connection with a given probe session (i.e., the denominator in $\hat{p}_{correct}$) was roughly nine times the number of items in that probe and often was larger.
 
-For convenience, the single-subject graphs have been grouped into three sets of 3-4 participants who demonstrated broadly similar patterns of response to treatment. Figure 2 depicts four participants for whom visual inspection provided strong evidence of a response to at least one type of treatment, and Figure 3 shows three participants for whom visual inspection provided moderate support of a response to treatment. Finally, Figure 3 shows four participants who showed no reliable evidence of a response to treatment. The participants in each group are discussed in detail below. **Comment on baseline stability: Which participants met the criterion of <10% mean session-to-session variability over the baseline interval? Which participants have demonstrations of noneffect in the baseline phase?** All participants met the criterion of <10% mean session-to-session variability, with the highest variability from Adrian (`r round(mean_session_to_session_change_3[1], digits=2)`) and Liam (`r round(mean_session_to_session_change_4[4], digits=2)`). There were no outlier baseline sessions that exceeded 2 standard deviations from the mean BL percentage for each participant. Finally, no particpant showed a rising trend in baseline sessions, as the percentage differences between the last 3 baseline sessions for each participant did not exceed the standard deviation for that participant.
+For convenience, the single-subject graphs have been grouped into three sets of 3-4 participants who demonstrated broadly similar patterns of response to treatment. Figure 2 depicts four participants for whom visual inspection provided strong evidence of a response to at least one type of treatment, and Figure 3 shows three participants for whom visual inspection provided moderate support of a response to treatment. Finally, Figure 3 shows four participants who showed no reliable evidence of a response to treatment. The participants in each group are discussed in detail below. **Comment on baseline stability: Which participants met the criterion of <10% mean session-to-session variability over the baseline interval? Which participants have demonstrations of noneffect in the baseline phase?** All participants met the criterion of <10% mean session-to-session variability, with the highest variability from Ella (`r round(mean_session_to_session_change_5[1], digits=2)`), Landon (`r round(mean_session_to_session_change_4[4], digits=2)`), and Aiden (`r round(mean_session_to_session_change_3[1], digits=2)`). There were no outlier baseline sessions that exceeded 2 standard deviations from the mean BL percentage for each participant. Finally, both Aiden and Ella showed a rising trend in baseline sessions, determined by noticing a rising trend in those participants whose percentage differences between the last 3 baseline sessions exceeded their standard deviations.
 
-Visual inspection of data from `r paste(demog$age_enrollment_years[demog$subject=="Adrian"], demog$age_enrollment_months[demog$subject=="Adrian"], sep=";")` year-old Adrian shows a large change in level between the baseline phase and all subsequent phases of treatment, with minimal overlap between observations in the baseline phase and any subsequent phase. This change occurred immediately after the initiation of treatment. Adrian's progress in the first phase, which featured traditional articulatory treatment, yielded a large ES~Phase1~ of `r data3$ESPhase1[data3$subject=="Adrian"]`. His performance declined slightly in the second phase, which featured biofeedback treatment, yielding an ES~Phase2~ of `r data3$ESPhase2[data3$subject=="Adrian"]` from midpoint to maintenance. However, his performance still remained substantially above baseline levels, with a final ES~All~ of `r data3short[1,10]`. 
+Visual inspection of data from `r paste(demog$age_enrollment_years[demog$subject=="Aiden"], demog$age_enrollment_months[demog$subject=="Aiden"], sep=";")` year-old Aiden shows a large change in level between the baseline phase and all subsequent phases of treatment, with minimal overlap between observations in the baseline phase and any subsequent phase. This change occurred immediately after the initiation of treatment. Aiden's progress in the first phase, which featured traditional articulatory treatment, yielded a large ES~Phase1~ of `r data3$ESPhase1[data3$subject=="Aiden"]`. His performance declined slightly in the second phase, which featured biofeedback treatment, yielding an ES~Phase2~ of `r data3$ESPhase2[data3$subject=="Aiden"]` from midpoint to maintenance. However, his performance still remained substantially above baseline levels, with a final ES~All~ of `r data3short[1,10]`. 
 
-Emma, age `r paste(demog$age_enrollment_years[demog$subject=="Emma"], demog$age_enrollment_months[demog$subject=="Emma"], sep=";")`, also showed a sizable change in level between the baseline phase and all subsequent phases of the study. This change was evident in post-treatment word probes within the first three sessions of treatment; from the fourth session on, there was virtually no overlap of data points with the baseline phase. The first phase, which featured biofeedback treatment, yielded an ES~Phase1~ of `r data3$ESPhase1[data3$subject=="Emma"]`. Emma's gains remained mostly stable through the second phase of treatment and the maintenance period, yielding an ES~All~ of `r data3$ESall[data3$subject=="Emma"]`. Overlap with the baseline phase was minimal from the midpoint session on. **Is unstable/rising baseline a threat to validity?**
+Ella, age `r paste(demog$age_enrollment_years[demog$subject=="Ella"], demog$age_enrollment_months[demog$subject=="Ella"], sep=";")`, also showed a sizable change in level between the baseline phase and all subsequent phases of the study. This change was evident in post-treatment word probes within the first three sessions of treatment; from the fourth session on, there was virtually no overlap of data points with the baseline phase. The first phase, which featured biofeedback treatment, yielded an ES~Phase1~ of `r data3$ESPhase1[data3$subject=="Ella"]`. Ella's gains remained mostly stable through the second phase of treatment and the maintenance period, yielding an ES~All~ of `r data3$ESall[data3$subject=="Ella"]`. Overlap with the baseline phase was minimal from the midpoint session on. **Is unstable/rising baseline a threat to validity?**
 
-Participants Liam, age `r paste(demog$age_enrollment_years[demog$subject=="Liam"], demog$age_enrollment_months[demog$subject=="Liam"], sep=";")`, and Madison, age `r paste(demog$age_enrollment_years[demog$subject=="Madison"], demog$age_enrollment_months[demog$subject=="Madison"], sep=";")`, exhibited similar trajectories of progress, although Madison showed higher overall accuracy throughout the study. Like Emma, both boys began in the biofeedback treatment condition and began to show gains within the first three sessions of treatment; they sustained their gains during midpoint probes and made additional improvements in the second phase of treatment. They likewise showed no overlap between the baseline phase and data points in the midpoint phase, second phase of treatment, or maintenance phase. In Madison's case, there also was very little overlap between the baseline phase and the first phase of treatment. For both boys, a larger effect size was calculated for the first phase of treatment, in which biofeedback was provided, although this could be attributed to a ceiling effect in Madison's case. Large overall effect sizes of `r data3$ESall[data3$subject=="Liam"]` and `r data3$ESall[data3$subject=="Madison"]` were observed for Liam and Madison, respectively. **Demonstration of noneffect: trend in Liam's baseline data?** **What is going on with Madison's tx2 pre-probe? Might there be missing data?**
+Participants Landon, age `r paste(demog$age_enrollment_years[demog$subject=="Liam"], demog$age_enrollment_months[demog$subject=="Liam"], sep=";")`, and Mason, age `r paste(demog$age_enrollment_years[demog$subject=="Madison"], demog$age_enrollment_months[demog$subject=="Madison"], sep=";")`, exhibited similar trajectories of progress, although Mason showed higher overall accuracy throughout the study. Like Ella, both boys began in the biofeedback treatment condition and began to show gains within the first three sessions of treatment; they sustained their gains during midpoint probes and made additional improvements in the second phase of treatment. They likewise showed no overlap between the baseline phase and data points in the midpoint phase, second phase of treatment, or maintenance phase. In Mason's case, there also was very little overlap between the baseline phase and the first phase of treatment. For both boys, a larger effect size was calculated for the first phase of treatment, in which biofeedback was provided, although this could be attributed to a ceiling effect in Mason's case. Large overall effect sizes of `r data3$ESall[data3$subject=="Landon"]` and `r data3$ESall[data3$subject=="Mason"]` were observed for Landon and Mason, respectively. **Demonstration of noneffect: trend in Landon's baseline data?** **What is going on with Mason's tx2 pre-probe? Might there be missing data?**
 
 
 ```{r, echo=FALSE, fig.width=7, fig.height=5,message=FALSE, warning=FALSE,strip.white=TRUE}
@@ -485,13 +512,21 @@ data$subject_number <- as.factor(data$subject_number)
 data$session = ordered(data$session, levels = c("BL1","BL2","BL3","BL4","BL5","TX1","TX2","TX3","TX4","TX5","TX6","TX7","TX8","TX9","TX10",
                                                 "MP1","MP2","MP3","TX11","TX12",
                                                 "TX13","TX14","TX15","TX16","TX17","TX18","TX19","TX20","MN1","MN2","MN3"))   
+#change psuedonyms to pseudo-pseudonyms
+data$originalpseudonym <- data$subject
+data$subject <- mapvalues(data$originalpseudonym, from = c("Adrian", "Brooklyn", "Connor", "Emily", 
+                                                           "Emma", "Gabriel",  "Hailey", "Hannah", 
+                                                           "Jack", "Liam", "Madison"), 
+                          to = c("Aiden", "Bryce", "Cooper", "Erica", 
+                                 "Ella", "Gregory",  "Holly", "Harper", 
+                                 "Jason", "Landon", "Mason"))
 
 #Subset to appropriate group of children
-data <- droplevels(filter(data, subject=="Adrian"|subject=="Liam"|subject=="Emma"|subject=="Madison"))
+data <- droplevels(filter(data, subject=="Aiden"|subject=="Landon"|subject=="Ella"|subject=="Mason"))
 
 #Specs for plotting
 par(mfrow=c(3,1))
-par(mar = c(2.5, 2.5, 2.5, 2.5))
+par(mar = c(4, 4, 1.5, 1.5))
 par(xpd=FALSE)
 
 #Loop through participants
@@ -532,8 +567,10 @@ for (i in seq_along(Children)){
   
   plot(numerical, BF_pre_percent, 
        main = label,
-       xaxt="n", xlab = "Session", ylab = "Mean rating", ylim = c(0, 100))
+       xaxt="n", xlab = NA, ylab = NA, ylim = c(0, 100))
   axis(1, at=numerical, labels=labels, cex.axis = 1.25)
+  mtext(side = 1, "Session", line = 2.5, cex = .75)
+  mtext(side = 2, expression(hat(p)), line = 2, cex = .75)
   #Plot baseline mean
   yline(bl1_m, lty=2)
   
@@ -577,7 +614,6 @@ for (i in seq_along(Children)){
                 pch = c(1,8,12,6), col=c("black","red", "blue","green"), bg = "white"), 
          legend("bottomright" ,cex=.9, legend = c("Pre BF", "Post BF","Pre Trad", "Post Trad"), 
                 pch = c(1,8,12,6), col=c("black","red", "blue","green"), bg = "white"))
-  
 }
 
 ```
@@ -585,11 +621,11 @@ for (i in seq_along(Children)){
 **Figure 2. Longitudinal plots of $\hat{p}_{correct}$ for participants with large positive effect sizes. Dashed line represents mean across baseline sessions. BL = Baseline, Tx = Treatment, MN = Maintenance.**
 
 
-Figure 3 shows three participants for whom visual inspection offered moderate evidence of a response to at least one type of treatment. Emily, age `r paste(demog$age_enrollment_years[demog$subject=="Emily"], demog$age_enrollment_months[demog$subject=="Emily"], sep=";")`, showed no visual evidence of improvement in the first phase, which featured traditional treatment. (An ES~Phase1~ of `r data3$ESPhase1[data3$subject=="Emily"]` was computed for her, but given that the raw difference in means was only `r data3$mp1_m[data3$subject=="Emily"]-data3$bl1_m[data3$subject=="Emily"]`, this was judged to be an artifact of low variance during the baseline phase.) During the second phase of treatment, Emily showed a change in trend from an unchanging near-zero level of accuracy to a small but consistent increase. This effect is ambiguous to interpret, since it emerged only in the last three sessions of the study and thus could reflect a cumulative effect of treatment over the preceding two months. Interestingly, the rising trend that Emily exhibited in her last three sessions of treatment continued into the maintenance phase, suggesting that ongoing generalization gains might be anticipated. Her final effect size (ES~All~) of `r data3$ESall[data3$subject=="Emily"]` reflected strong overall gains.
+Figure 3 shows three participants for whom visual inspection offered moderate evidence of a response to at least one type of treatment. Erica, age `r paste(demog$age_enrollment_years[demog$subject=="Emily"], demog$age_enrollment_months[demog$subject=="Emily"], sep=";")`, showed no visual evidence of improvement in the first phase, which featured traditional treatment. (An ES~Phase1~ of `r data3$ESPhase1[data3$subject=="Erica"]` was computed for her, but given that the raw difference in means was only `r data3$mp1_m[data3$subject=="Erica"]-data3$bl1_m[data3$subject=="Erica"]`, this was judged to be an artifact of low variance during the baseline phase.) During the second phase of treatment, Erica showed a change in trend from an unchanging near-zero level of accuracy to a small but consistent increase. This effect is ambiguous to interpret, since it emerged only in the last three sessions of the study and thus could reflect a cumulative effect of treatment over the preceding two months. Interestingly, the rising trend that Erica exhibited in her last three sessions of treatment continued into the maintenance phase, suggesting that ongoing generalization gains might be anticipated. Her final effect size (ES~All~) of `r data3$ESall[data3$subject=="Erica"]` reflected strong overall gains.
 
-Participant Jack, age `r paste(demog$age_enrollment_years[demog$subject=="Jack"], demog$age_enrollment_months[demog$subject=="Jack"], sep=";")`, showed a trajectory that was in some ways a mirror image of Emily's. Both visual inspection and effect size showed no meaningful change during the first phase of treatment, which featured biofeedback. He also showed no change throughout most of the second treatment phase, but in the final few sessions, his perceptually rated accuracy took on a distinct upward slope. Unlike Emily, his gains tended to affect post-test but not pre-test probes, and accuracy was not sustained throughout the maintenance period. This suggests more short-term learning that was not yet robustly transfering to other contexts. Accordingly, the effect sizes calculated using midpoint and maintenance probe data suggested a weaker effect of treatment than the within-treatment probes (ES~Phase1~: `r data3$ESPhase1[data3$subject=="Jack"]`; ES~Phase2~: `r data3$ESPhase2[data3$subject=="Jack"]`; ES~All~: `r data3$ESall[data3$subject=="Jack"]`). **What's going on with Jack's TX1 pre probe?** 
+Participant Jason, age `r paste(demog$age_enrollment_years[demog$subject=="Jack"], demog$age_enrollment_months[demog$subject=="Jack"], sep=";")`, showed a trajectory that was in some ways a mirror image of Erica's. Both visual inspection and effect size showed no meaningful change during the first phase of treatment, which featured biofeedback. He also showed no change throughout most of the second treatment phase, but in the final few sessions, his perceptually rated accuracy took on a distinct upward slope. Unlike Erica, his gains tended to affect post-test but not pre-test probes, and accuracy was not sustained throughout the maintenance period. This suggests more short-term learning that was not yet robustly transfering to other contexts. Accordingly, the effect sizes calculated using midpoint and maintenance probe data suggested a weaker effect of treatment than the within-treatment probes (ES~Phase1~: `r data3$ESPhase1[data3$subject=="Jason"]`; ES~Phase2~: `r data3$ESPhase2[data3$subject=="Jason"]`; ES~All~: `r data3$ESall[data3$subject=="Jason"]`). **What's going on with Jason's TX1 pre probe?** 
 
-Participant Gabriel, age `r paste(demog$age_enrollment_years[demog$subject=="Gabriel"], demog$age_enrollment_months[demog$subject=="Gabriel"], sep=";")`, showed a small increase in the perceptually rated accuracy of rhotics produced during Phase 1, followed by a slightly larger increase during Phase 2. Ongoing overlap in data points between baseline and treatment phases prevents us from attaching a strong interpretation to these data, and gains were minimally sustained into the midpoint and maintenance probe intervals. All three effect sizes computed for Gabriel fell short of the threshold to be considered clinically significant (ES~Phase1~: `r data3$ESPhase1[data3$subject=="Gabriel"]`; ES~Phase2~: `r data3$ESPhase2[data3$subject=="Gabriel"]`; ES~All~: `r data3$ESall[data3$subject=="Gabriel"]`). On the other hand, Gabriel's accuracy during both phases of treatment was much more variable than at baseline. This suggested that he was engaging some degree of exploration of new strategies for rhotic production, although he had not yet stabilized a production pattern that would reliably yield a perceptually accurate rhotic sound.
+Participant Gregory, age `r paste(demog$age_enrollment_years[demog$subject=="Gabriel"], demog$age_enrollment_months[demog$subject=="Gabriel"], sep=";")`, showed a small increase in the perceptually rated accuracy of rhotics produced during Phase 1, followed by a slightly larger increase during Phase 2. Ongoing overlap in data points between baseline and treatment phases prevents us from attaching a strong interpretation to these data, and gains were minimally sustained into the midpoint and maintenance probe intervals. All three effect sizes computed for Gregory fell short of the threshold to be considered clinically significant (ES~Phase1~: `r data3$ESPhase1[data3$subject=="Gregory"]`; ES~Phase2~: `r data3$ESPhase2[data3$subject=="Gregory"]`; ES~All~: `r data3$ESall[data3$subject=="Gregory"]`). On the other hand, Gregory's accuracy during both phases of treatment was much more variable than at baseline. This suggested that he was engaging some degree of exploration of new strategies for rhotic production, although he had not yet stabilized a production pattern that would reliably yield a perceptually accurate rhotic sound.
 
 ```{r, echo=FALSE, fig.width=7, fig.height=5,message=FALSE, warning=FALSE}
 #################################################################
@@ -604,13 +640,21 @@ data$subject_number <- as.factor(data$subject_number)
 data$session = ordered(data$session, levels = c("BL1","BL2","BL3","BL4","BL5","TX1","TX2","TX3","TX4","TX5","TX6","TX7","TX8","TX9","TX10",
                                                 "MP1","MP2","MP3","TX11","TX12",
                                                 "TX13","TX14","TX15","TX16","TX17","TX18","TX19","TX20","MN1","MN2","MN3"))   
+#change psuedonyms to pseudo-pseudonyms
+data$originalpseudonym <- data$subject
+data$subject <- mapvalues(data$originalpseudonym, from = c("Adrian", "Brooklyn", "Connor", "Emily", 
+                                                           "Emma", "Gabriel",  "Hailey", "Hannah", 
+                                                           "Jack", "Liam", "Madison"), 
+                          to = c("Aiden", "Bryce", "Cooper", "Erica", 
+                                 "Ella", "Gregory",  "Holly", "Harper", 
+                                 "Jason", "Landon", "Mason"))
 
 #Subset to appropriate group of children
-data <- droplevels(filter(data, subject=="Emily"|subject=="Jack"|subject=="Gabriel"))
+data <- droplevels(filter(data, subject=="Erica"|subject=="Jason"|subject=="Gregory"))
 
 #Specs for plotting
 par(mfrow=c(3,1))
-par(mar = c(2.5, 2.5, 2.5, 2.5))
+par(mar = c(4, 4, 1.5, 1.5))
 par(xpd=FALSE)
 
 #Loop through participants
@@ -651,10 +695,14 @@ for (i in seq_along(Children)){
   
   plot(numerical, BF_pre_percent, 
        main = label,
-       xaxt="n", xlab = "Session", ylab = "Mean rating", ylim = c(0, 100))
+       xaxt="n", xlab = NA, ylab = NA, ylim = c(0, 100))
   axis(1, at=numerical, labels=labels, cex.axis = 1.25)
+  mtext(side = 1, "Session", line = 2.5, cex = .75)
+  mtext(side = 2, expression(hat(p)), line = 2, cex = .75)
+
   #Plot baseline mean
   yline(bl1_m, lty=2)
+  
   
   points(numerical+.2, BF_post_percent,  pch = 8, col = "red", lty=2) 
   
@@ -696,14 +744,13 @@ for (i in seq_along(Children)){
                 pch = c(1,8,12,6), col=c("black","red", "blue","green"), bg = "white"), 
          legend("bottomright" ,cex=.9, legend = c("Pre BF", "Post BF","Pre Trad", "Post Trad"), 
                 pch = c(1,8,12,6), col=c("black","red", "blue","green"), bg = "white"))
-  
 }
 
 ```
 
 **Figure 3. Longitudinal plots of $\hat{p}_{correct}$ for participants with small positive effect sizes. Dashed line represents mean across baseline sessions. BL = Baseline, Tx = Treatment, MN = Maintenance.**
 
-Finally, Figure 4 depicts the four participants for whom visual inspection of generalization probe data yielded no significant evidence of a response to either type of treatment. Three of these participants (Brooklyn, Hailey, and Hannah) began treatment in the traditional treatment condition, while one participant (Connor) received treatment in the opposite order. Across all of these participants, visual inspection of perceptual rating data yields a consistent picture of minimal change across all phases of the study. Effect sizes are generally in accordance with visual inspection; an exception is Connor's ES~Phase1~ of `r data3$ESPhase1[data3$subject=="Connor"]`, but this value is inflated by minimal variance during the baseline phase. Note also that most participants in this group had near-zero perceptual accuracy ratings at baseline, contrasting with the more intermediate accuracy ratings given to participants in the other groups; we return to this topic in the discussion section.
+Finally, Figure 4 depicts the four participants for whom visual inspection of generalization probe data yielded no significant evidence of a response to either type of treatment. Three of these participants (Bryce, Holly, and Harper) began treatment in the traditional treatment condition, while one participant (Cooper) received treatment in the opposite order. Across all of these participants, visual inspection of perceptual rating data yields a consistent picture of minimal change across all phases of the study. Effect sizes are generally in accordance with visual inspection; an exception is Cooper's ES~Phase1~ of `r data3$ESPhase1[data3$subject=="Cooper"]`, but this value is inflated by minimal variance during the baseline phase. Note also that most participants in this group had near-zero perceptual accuracy ratings at baseline, contrasting with the more intermediate accuracy ratings given to participants in the other groups; we return to this topic in the discussion section.
 
 
 ```{r, echo=FALSE, fig.width=7, fig.height=5, message=FALSE, warning=FALSE}
@@ -719,13 +766,21 @@ data$subject_number <- as.factor(data$subject_number)
 data$session = ordered(data$session, levels = c("BL1","BL2","BL3","BL4","BL5","TX1","TX2","TX3","TX4","TX5","TX6","TX7","TX8","TX9","TX10",
                                                 "MP1","MP2","MP3","TX11","TX12",
                                                 "TX13","TX14","TX15","TX16","TX17","TX18","TX19","TX20","MN1","MN2","MN3"))   
+#change psuedonyms to pseudo-pseudonyms
+data$originalpseudonym <- data$subject
+data$subject <- mapvalues(data$originalpseudonym, from = c("Adrian", "Brooklyn", "Connor", "Emily", 
+                                                           "Emma", "Gabriel",  "Hailey", "Hannah", 
+                                                           "Jack", "Liam", "Madison"), 
+                          to = c("Aiden", "Bryce", "Cooper", "Erica", 
+                                 "Ella", "Gregory",  "Holly", "Harper", 
+                                 "Jason", "Landon", "Mason"))
 
 #Subset to appropriate group of children
-data <- droplevels(filter(data, subject=="Brooklyn"|subject=="Hailey"|subject=="Connor"|subject=="Hannah"))
+data <- droplevels(filter(data, subject=="Bryce"|subject=="Holly"|subject=="Cooper"|subject=="Harper"))
 
 #Specs for plotting
 par(mfrow=c(3,1))
-par(mar = c(2.5, 2.5, 2.5, 2.5))
+par(mar = c(4, 4, 1.5, 1.5))
 par(xpd=FALSE)
 
 #Loop through participants
@@ -766,8 +821,10 @@ for (i in seq_along(Children)){
   
   plot(numerical, BF_pre_percent, 
        main = label,
-       xaxt="n", xlab = "Session", ylab = "Mean rating", ylim = c(0, 100))
+       xaxt="n", xlab = NA, ylab = NA, ylim = c(0, 100))
   axis(1, at=numerical, labels=labels, cex.axis = 1.25)
+  mtext(side = 1, "Session", line = 2.5, cex = .75)
+  mtext(side = 2, expression(hat(p)), line = 2, cex = .75)
   #Plot baseline mean
   yline(bl1_m, lty=2)
   
@@ -811,7 +868,6 @@ for (i in seq_along(Children)){
                 pch = c(1,8,12,6), col=c("black","red", "blue","green"), bg = "white"), 
          legend("bottomright" ,cex=.9, legend = c("Pre BF", "Post BF","Pre Trad", "Post Trad"), 
                 pch = c(1,8,12,6), col=c("black","red", "blue","green"), bg = "white"))
-  
 }
 
 ```
@@ -929,11 +985,7 @@ sumdataTX <- dataTX %>%
   dplyr::group_by(subject, condition, tx_order) %>%
     dplyr::summarise(sum=sum(response), total=length(response))
 
-#I think order of operations says that this is just multiplying sumdataTX$sum by sumdataTX$total:
-#sumdataTX$phat <- 100*sumdataTX$sum/100*sumdataTX$total    #error????
-
-sumdataTX$phat <- 100*(sumdataTX$sum/sumdataTX$total)   
-
+sumdataTX$phat <- 100*(sumdataTX$sum/sumdataTX$total)
 
 head(sumdataTX)
 sumdataTX$tx_order_plot <- mapvalues(sumdataTX$tx_order, from = c("BF_TRAD", "TRAD_BF"), 
@@ -942,7 +994,7 @@ sumdataTX$Condition <- mapvalues(sumdataTX$condition, from = c("BF", "Trad"),
                                      to = c("Biofeedback", "Traditional"))
 
 p1 <- qplot(x = tx_order_plot, y = phat, fill = Condition, data = sumdataTX, geom = "boxplot", 
-            main = expression(paste(hat(p), ' Treatment Accuracy by Treatment Order')), xlab = "Treatment Order", ylab = expression(hat(p)))
+            main = expression(paste(hat(p), ' Accuracy by Treatment Order and Condition')), xlab = "Treatment Order", ylab = expression(hat(p)))
 p1
 
 #df to call specific fixed effects in the text
@@ -964,6 +1016,15 @@ data <- read.csv("clean_data.csv")
 #Check that variables are of correct types
 #str(data)
 data$subject_number <- as.factor(data$subject_number)
+
+#change psuedonyms to pseudo-pseudonyms
+data$originalpseudonym <- data$subject
+data$subject <- mapvalues(data$originalpseudonym, from = c("Adrian", "Brooklyn", "Connor", "Emily", 
+                                                           "Emma", "Gabriel",  "Hailey", "Hannah", 
+                                                           "Jack", "Liam", "Madison"), 
+                          to = c("Aiden", "Bryce", "Cooper", "Erica", 
+                                 "Ella", "Gregory",  "Holly", "Harper", 
+                                 "Jason", "Landon", "Mason"))
 
 
 #This code creates an option to plot only the primary words and exclude generalization words
@@ -1002,6 +1063,7 @@ TX$diff <- TX$Post - TX$Pre
 #head(TX)
 
 #Visualize the values
+par(mar = c(4, 4, 3, 1.5))
 #TX$tx_order[1]
 #Loop through participants
 Children <- levels(TX$subject)
@@ -1018,7 +1080,7 @@ for (i in seq_along(Children)){
 
 #Calculate means for each phase
 #Temp option to strike Hannah data due to missing session
-TX <- droplevels(TX[TX$subject!="Hannah",])
+#TX <- droplevels(TX[TX$subject!="Hannah",])
 #str(TX)
 
 #Code by treatment phase (chronological order; 1 or 2)
@@ -1079,6 +1141,6 @@ TX <- TX %>%
 
 -Regression yields main effect of treatment type (TRAD > BF) but also interaction between treatment type and treatment order. The majority of generalization gains observed seem to be associated with traditional treatment that followed biofeedback treatment. This could be a fluke (with the small number of subjects, random allocation of participants to TRAD-first vs BF-first condition could be skewing outcomes). On the other hand, this outcome is consistent with research and theories of motor learning.
 
--Patterns of relative response: No conclusive differences; examples of participants who responded to TRAD but not BF treatment (Jack, Adrian), to BF but not TRAD (Emily), or more to BF than to TRAD (Liam, Emma, Madison--but see ceiling effect)
+-Patterns of relative response: No conclusive differences; examples of participants who responded to TRAD but not BF treatment (Jason, Aiden), to BF but not TRAD (Erica), or more to BF than to TRAD (Landon, Ella, Mason--but see ceiling effect)
 
 -Discuss within-session gains versus generalization gains. Are these results consistent with the theoretically motivated claim that biofeedback should enhance initial acquisition of a target, while traditional treatment should promote generalization? May need to leave this for a subsequent paper. Comment on generalization and dose.
