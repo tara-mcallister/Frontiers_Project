@@ -6,15 +6,16 @@ library(fields)
 library(car)
 library(reshape2)
 library(plyr)
-
-data  = read.csv("BFS2_trials_summarized", sep="\t", header=T)
+getwd()
+#data  = read.csv("BFS2_trials_summarized", sep="\t", header=T)
 #To clean the unsummarized data, uncomment this:
-#data  = read.csv("BFS2_trials_unsummarized", sep="\t", header=T)
+data  = read.csv("BFS2_trials_unsummarized", sep="\t", header=T)
 
 str(data)
 #data$X.1 <- NULL
 dim(data)
 which(is.na(data$mean))
+
 
 #Subject as factor
 data$subject <- as.factor(data$subject)
@@ -100,7 +101,8 @@ levels(data$prepost)
 #Add demographic info
 demog = read.csv("BFS2_demog.csv")
 demog$subject <- as.factor(demog$subject)
-#This is for the unmerged data, where subject is coded as Subject
+#UNCOMMENT THIS FOR THE UNMERGED DATA
+#where subject is coded as Subject
 data$subject <- data$Subject
 data <- left_join(data, demog, by="subject")
 data$subject <- as.factor(data$subject)
@@ -114,6 +116,8 @@ data$session = ordered(data$session, levels = c("BL1","BL2","BL3","BL4","BL5","T
 str(data)
 
 #Save cleaned data
-write.csv(data, "clean_data.csv")
+#write.csv(data, "clean_data.csv")
 #To save cleaned unsummarized data, uncomment this:
-#write.csv(data, "clean_data_unsummarized.csv")
+write.csv(data, "clean_data_unsummarized.csv")
+
+
