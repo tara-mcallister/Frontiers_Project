@@ -434,8 +434,7 @@ for (i in c("Emma", "Madison")){
 
 #1. Mean session-to-session change: calculate the difference for each pair of adjacent sessions (score[session N+1] - score[session N]), sum across all pairs of adjacent sessions, divided by the total number of pairs
 
-round(c(mean_session_to_session_change_3, mean_session_to_session_change_4, mean_session_to_session_change_5), digits=2) #1 answer Adrian & Liam stand out
-
+round(c(mean_session_to_session_change_3, mean_session_to_session_change_4, mean_session_to_session_change_5), digits=2) #1 #answer Emma, Adrian & Liam stand out
 
 #2. Identify any outliers: Points > 2 SD away from the mean across the baseline interval
 high <- c(); low <- c()
@@ -448,12 +447,23 @@ rbind(high, low)  #2 answer:  no outliers
 
 
 #3. Identify any baseline phases that end on a rising trend: last 3 datapoints show a monotonic increase with a magnitude that is greater than the baseline SD
+#originally interpreted as session-session rise exceeding sd:
+rising_session <- c()
+for (i in Children){
+  i <- subset(BL_sessions, Subject == i)
+  rising_session <- rbind(rising_session, subset(i, i$diff > i$sd))
+}
+rising_session   #3a answer:  Emma & Hannah showed last 3 session diff greater than sd
+
+#does the sum of the rise in final 3 sessions exceed the sd?
 rising <- c()
 for (i in Children){
   i <- subset(BL_sessions, Subject == i)
-  rising <- rbind(rising, subset(i, i$diff > i$sd))
+  i <- subset(i, session == tail(sort(i$session), 3)[1] | session == tail(sort(i$session), 3)[2] | session == tail(sort(i$session), 3)[3])
+  rising <- rbind(rising, subset(i, (max(i$percent) - min(i$percent)) > i$sd))
 }
-rising   #3 answer:  no participant showed last 3 session diff greater than sd
+rising  #3b:  Yes, for all participants, the max-min diff in the 3 final sessions exceeds the sd, only for Adrian and Emma does it appear to be a monotonic increase
+
 ########## end BL stability measures
 ```
 
@@ -463,7 +473,7 @@ Figures 2-4 represent each participant's pattern of change in accuracy ($\hat{p}
 
 The mean number of probe words on which $\hat{p}_{correct}$ scores are based was `r round(mPREPOST, digits=2)` (SD = `r round(sdPREPOST, digits=2)`) for pre- and post-treatment probes and ###`r mBLMN` (SD = `r sdBLMN`) for baseline and maintenance probes. The number of ratings collected in connection with a given probe session (i.e., the denominator in $\hat{p}_{correct}$) was roughly nine times the number of items in that probe and often was larger.
 
-For convenience, the single-subject graphs have been grouped into three sets of 3-4 participants who demonstrated broadly similar patterns of response to treatment. Figure 2 depicts four participants for whom visual inspection provided strong evidence of a response to at least one type of treatment, and Figure 3 shows three participants for whom visual inspection provided moderate support of a response to treatment. Finally, Figure 3 shows four participants who showed no reliable evidence of a response to treatment. The participants in each group are discussed in detail below. **Comment on baseline stability: Which participants met the criterion of <10% mean session-to-session variability over the baseline interval? Which participants have demonstrations of noneffect in the baseline phase?** All participants met the criterion of <10% mean session-to-session variability, with the highest variability from Adrian (`r round(mean_session_to_session_change_3[1], digits=2)`) and Liam (`r round(mean_session_to_session_change_4[4], digits=2)`). There were no outlier baseline sessions that exceeded 2 standard deviations from the mean BL percentage for each participant. Finally, no particpant showed a rising trend in baseline sessions, as the percentage differences between the last 3 baseline sessions for each participant did not exceed the standard deviation for that participant.
+For convenience, the single-subject graphs have been grouped into three sets of 3-4 participants who demonstrated broadly similar patterns of response to treatment. Figure 2 depicts four participants for whom visual inspection provided strong evidence of a response to at least one type of treatment, and Figure 3 shows three participants for whom visual inspection provided moderate support of a response to treatment. Finally, Figure 3 shows four participants who showed no reliable evidence of a response to treatment. The participants in each group are discussed in detail below. **Comment on baseline stability: Which participants met the criterion of <10% mean session-to-session variability over the baseline interval? Which participants have demonstrations of noneffect in the baseline phase?** All participants met the criterion of <10% mean session-to-session variability, with the highest variability from Emma (`r round(mean_session_to_session_change_5[1], digits=2)`), Liam (`r round(mean_session_to_session_change_4[4], digits=2)`), and Adrian (`r round(mean_session_to_session_change_3[1], digits=2)`). There were no outlier baseline sessions that exceeded 2 standard deviations from the mean BL percentage for each participant. Finally, both Adrian and Emma showed a rising trend in baseline sessions, determined by noticing a rising trend in those participants whose percentage differences between the last 3 baseline sessions exceeded their standard deviations.
 
 Visual inspection of data from `r paste(demog$age_enrollment_years[demog$subject=="Adrian"], demog$age_enrollment_months[demog$subject=="Adrian"], sep=";")` year-old Adrian shows a large change in level between the baseline phase and all subsequent phases of treatment, with minimal overlap between observations in the baseline phase and any subsequent phase. This change occurred immediately after the initiation of treatment. Adrian's progress in the first phase, which featured traditional articulatory treatment, yielded a large ES~Phase1~ of `r data3$ESPhase1[data3$subject=="Adrian"]`. His performance declined slightly in the second phase, which featured biofeedback treatment, yielding an ES~Phase2~ of `r data3$ESPhase2[data3$subject=="Adrian"]` from midpoint to maintenance. However, his performance still remained substantially above baseline levels, with a final ES~All~ of `r data3short[1,10]`. 
 
@@ -932,7 +942,7 @@ sumdataTX <- dataTX %>%
 #I think order of operations says that this is just multiplying sumdataTX$sum by sumdataTX$total:
 #sumdataTX$phat <- 100*sumdataTX$sum/100*sumdataTX$total    #error????
 
-sumdataTX$phat <- 100*(sumdataTX$sum/sumdataTX$total)   
+sumdataTX$phat <- 100*(sumdataTX$sum/sumdataTX$total)
 
 
 head(sumdataTX)
