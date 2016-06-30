@@ -493,7 +493,7 @@ For convenience, the single-subject graphs have been grouped into three sets of 
 
 Figure 2 shows four participants for whom visual inspection offered strong evidence of a response to at least one type of treatment. Visual inspection of data from `r paste(demog$age_enrollment_years[demog$subject=="Aiden"], demog$age_enrollment_months[demog$subject=="Aiden"], sep=";")` year-old Aiden shows a large change in level between the baseline phase and all subsequent phases of treatment, with minimal overlap between observations in the baseline phase and any subsequent phase. This change occurred immediately after the initiation of treatment. Aiden's progress in the first phase, which featured traditional articulatory treatment, yielded a large ES~Phase1~ of `r data3$ESPhase1[data3$subject=="Aiden"]`. His performance declined to some extent in the second phase, which featured biofeedback treatment, yielding an *ES~Phase2~* of `r data3$ESPhase2[data3$subject=="Aiden"]` from midpoint to maintenance. However, his performance still remained substantially above baseline levels, with a final *ES~All~* of `r data3short[1,10]`. 
 
-Ella, age `r paste(demog$age_enrollment_years[demog$subject=="Ella"], demog$age_enrollment_months[demog$subject=="Ella"], sep=";")`, also showed a sizable change in level between the baseline phase and all subsequent phases of the study. This change was evident in post-treatment word probes within the first three sessions of treatment; from the fourth session on, there was virtually no overlap of data points with the baseline phase. The first phase, which featured biofeedback treatment, yielded an *ES~Phase1~* of `r data3$ESPhase1[data3$subject=="Ella"]`. Ella's gains remained mostly stable through the second phase of treatment and the maintenance period, yielding an *ES~All~* of `r data3$ESall[data3$subject=="Ella"]`. Overlap with the baseline phase was minimal from the midpoint session on. 
+Ella, age `r paste(demog$age_enrollment_years[demog$subject=="Emily"], demog$age_enrollment_months[demog$subject=="Emily"], sep=";")`, also showed a sizable change in level between the baseline phase and all subsequent phases of the study. This change was evident in post-treatment word probes within the first three sessions of treatment; from the fourth session on, there was virtually no overlap of data points with the baseline phase. The first phase, which featured biofeedback treatment, yielded an *ES~Phase1~* of `r data3$ESPhase1[data3$subject=="Ella"]`. Ella's gains remained mostly stable through the second phase of treatment and the maintenance period, yielding an *ES~All~* of `r data3$ESall[data3$subject=="Ella"]`. Overlap with the baseline phase was minimal from the midpoint session on. 
 
 Participants Landon, age `r paste(demog$age_enrollment_years[demog$subject=="Liam"], demog$age_enrollment_months[demog$subject=="Liam"], sep=";")`, and Mason, age `r paste(demog$age_enrollment_years[demog$subject=="Madison"], demog$age_enrollment_months[demog$subject=="Madison"], sep=";")`, exhibited similar trajectories of progress, although Mason showed higher overall accuracy throughout the study. Like Ella, both boys began in the biofeedback treatment condition and began to show gains within the first three sessions of treatment; they sustained their gains during midpoint probes and made additional improvements in the second phase of treatment. They likewise showed no overlap between the baseline phase and data points in the midpoint phase, second phase of treatment, or maintenance phase. In Mason's case, there also was very little overlap between the baseline phase and the first phase of treatment. For both boys, a larger effect size was calculated for the first phase of treatment, in which biofeedback was provided, although this could be attributed to a ceiling effect in Mason's case. Large overall effect sizes of `r data3$ESall[data3$subject=="Landon"]` and `r data3$ESall[data3$subject=="Mason"]` were observed for Landon and Mason, respectively.
 
@@ -525,7 +525,7 @@ data$subject = ordered(data$subject, levels= c("Aiden","Landon","Ella","Mason"))
 
 
 #Specs for plotting
-par(mfrow=c(3,1))
+par(mfrow=c(4,1))
 par(mar = c(4, 4, 1.5, 1.5))
 par(xpd=FALSE)
 
@@ -653,7 +653,7 @@ data <- droplevels(filter(data, subject=="Erica"|subject=="Jason"|subject=="Greg
 data$subject = ordered(data$subject, levels= c("Erica","Gregory","Jason"))
 
 #Specs for plotting
-par(mfrow=c(3,1))
+par(mfrow=c(4,1))
 par(mar = c(4, 4, 1.5, 1.5))
 par(xpd=FALSE)
 
@@ -750,7 +750,7 @@ for (i in seq_along(Children)){
 
 **Figure 3. Longitudinal plots of $\hat{p}_{correct}$ for participants with small positive effect sizes. Dashed line represents mean across baseline sessions. BL = Baseline, Tx = Treatment, MN = Maintenance.**
 
-Finally, Figure 4 depicts the four participants for whom visual inspection of generalization probe data yielded no significant evidence of a response to either type of treatment. Three of these participants (Bryce, Holly, and Harper) began treatment in the traditional treatment condition, while one participant (Cooper) received treatment in the opposite order. Across all of these participants, visual inspection of perceptual rating data yields a consistent picture of minimal change across all phases of the study. Effect sizes are generally in accordance with visual inspection; an exception is Cooper's *ES~Phase1~* of `r data3$ESPhase1[data3$subject=="Cooper"]`, but this value is inflated by minimal variance during the baseline phase. Note also that most participants in this group had near-zero perceptual accuracy ratings at baseline, contrasting with the more intermediate accuracy ratings given to participants in the other groups; we return to this topic in the discussion section.
+Finally, Figure 4 depicts the four participants for whom visual inspection of generalization probe data yielded no significant evidence of a response to either type of treatment. Three of these participants (Bryce, Holly, and Harper) began treatment in the traditional treatment condition, while one participant (Cooper) received treatment in the opposite order. Across all of these participants, visual inspection of perceptual rating data yields a consistent picture of minimal change across all phases of the study. Effect sizes are generally in accordance with visual inspection; an exception is Cooper's *ES~Phase1~* of `r formatC(data3$ESPhase1[data3$subject=="Cooper"], format='f', digits=1)`, but this value is inflated by minimal variance during the baseline phase. Note also that most participants in this group had near-zero perceptual accuracy ratings at baseline, contrasting with the more intermediate accuracy ratings given to participants in the other groups; we return to this topic in the discussion section.
 
 
 ```{r, echo=FALSE, fig.width=7, fig.height=5, message=FALSE, warning=FALSE}
@@ -781,7 +781,7 @@ data$subject = ordered(data$subject, levels= c("Bryce","Holly","Harper", "Cooper
 
 
 #Specs for plotting
-par(mfrow=c(3,1))
+par(mfrow=c(4,1))
 par(mar = c(4, 4, 1.5, 1.5))
 par(xpd=FALSE)
 
@@ -887,7 +887,7 @@ ESdata <- data3
 #Is there a condition effect? Boxplot depicting BF phase across participants, boxplot depicting TRAD phase across participants
 phasedata <- gather(ESdata,Type, ES, c(ES_TRAD, ES_BF))
 #head(phasedata)
-p1 <- qplot(data=phasedata, x=Type, y=ES, geom="boxplot")
+p1 <- qplot(data=phasedata, x=Type, y=ES, geom="boxplot", main = "Insert Title")
 #boxplot(phasedata$BF_advantage)
 
 #Is there an order effect? Boxplot depicting ES~Phase1~ across participants, boxplot depicting ES~Phase2~ across participants
@@ -895,27 +895,41 @@ p1 <- qplot(data=phasedata, x=Type, y=ES, geom="boxplot")
 orderdata <- gather(ESdata,tx_Order, ES, c(ESPhase1, ESPhase2))
 #head(phasedata)
 
-p2 <- qplot(data=orderdata, x=tx_Order, y=ES, geom="boxplot")
+p2 <- qplot(data=orderdata, x=tx_Order, y=ES, geom="boxplot", main = "Insert Title")
 #boxplot(phasedata$order_effect)
 
 both <- gather(ESdata, tx_Order, ES, c(ESPhase1, ESPhase2))
 #head(phasedata)
 
-p3 <- qplot(data=phasedata, x=tx_order, y=ES, fill=Type, geom="boxplot")
-#boxplot(phasedata$order_effect)
+phasedata$tx_order_plot <- mapvalues(phasedata$tx_order, from = c("BF_TRAD", "TRAD_BF"), 
+                          to = c("BF-first", "Traditional-first"))
+phasedata$Condition <- mapvalues(phasedata$Type, from = c("ES_BF", "ES_TRAD"), 
+                                     to = c("Biofeedback", "Traditional"))
 
+#phasedata <- phasedata[order(phasedata$tx_order_plot, decreasing = TRUE), ]
+phasedata$tx_order_plot = ordered(phasedata$tx_order_plot, levels = c("BF-first","Traditional-first"))
+
+p3 <- qplot(data = phasedata, x = tx_order_plot, y = ES, fill = Condition, geom = "boxplot",
+            main = "Effect Sizes by Condition and Treatment Order", xlab = "Treatment Order", ylab = "Effect Size")
+
+#boxplot(phasedata$order_effect)
 ```
 
 Although the primary focus of this single-subject experimental study is on within-subject changes, the counterbalanced design makes it possible to explore between-subjects effects as well. The boxplots in Figures 5-6 show the distribution of effect sizes observed when the data are partitioned in different ways. In Figure 5a, effect sizes associated with biofeedback treatment phases (*ES~BF~*) are compared against effect sizes from traditional treatment phases (*ES~Trad~*), independent of the order in which the two types of treatment were delivered. Figure 5b examines a possible order effect, comparing the distribution of *ES~Phase1~* versus *ES~Phase2~*, independent of the type of treatment delivered in each phase. Finally, Figure 6 considers a possible interaction between treatment type and order of treatment delivery: participants are partitioned into those who received biofeedback first versus traditional treatment first, and the distribution of effect sizes observed in each treatment condition is plotted. 
 
-```{r, echo=FALSE, cache=TRUE,message=FALSE, warning=FALSE}
+```{r, echo=FALSE, cache=TRUE, message=FALSE, warning=FALSE}
 grid.arrange(p1, p2, ncol=2)
 ```
 
 **Figure 5. Boxplots depicting the distribution of effect sizes observed in connection with (A) biofeedback versus traditional treatment, independent of phase order; (B) phase 1 versus phase 2 of treatment, independent of treatment type.**
 
-```{r, echo=FALSE, cache=TRUE,message=FALSE, warning=FALSE}
-p3
+```{r, echo=FALSE, cache=FALSE, message=FALSE, warning=FALSE}
+p3 + theme(plot.title = element_text(size = rel(1.5))) + 
+    theme(axis.title.y = element_text(size = rel(1.5))) + 
+    theme(axis.title.x = element_text(size = rel(1.5))) + 
+    theme(legend.text = element_text(size = rel(1.5))) + 
+    theme(legend.title = element_text(size = rel(1.5))) +
+    theme(axis.text = element_text(size = rel(1.5)))
 ```
 
 **Figure 6. Boxplots depicting the distribution of effect sizes observed in connection with biofeedback versus traditional treatment when biofeedback treatment was provided first, versus the opposite order.**
@@ -924,7 +938,7 @@ Figure 5a shows that the effect size distributions observed in biofeedback versu
 
 ##Across-subjects comparisons: Mixed logistic model
 
-```{r, echo=FALSE, cache=TRUE,message=FALSE, warning=FALSE}
+```{r, echo=FALSE, cache=FALSE, message=FALSE, warning=FALSE}
 #############################################################
 #LOGISTIC MIXED MODEL
 #############################################################
@@ -970,13 +984,19 @@ sumdataTX$phat <- 100*(sumdataTX$sum/sumdataTX$total)
 
 #head(sumdataTX)
 sumdataTX$tx_order_plot <- mapvalues(sumdataTX$tx_order, from = c("BF_TRAD", "TRAD_BF"), 
-                          to = c("Biofeedback/Traditional", "Traditional/Biofeedback"))
+                          to = c("BF-first", "Traditional-first"))
 sumdataTX$Condition <- mapvalues(sumdataTX$condition, from = c("BF", "Trad"), 
                                      to = c("Biofeedback", "Traditional"))
 
 p4 <- qplot(x = tx_order_plot, y = phat, fill = Condition, data = sumdataTX, geom = "boxplot", 
-            main = expression(paste(hat(p), ' Accuracy by Treatment Order and Condition')), xlab = "Treatment Order", ylab = expression(hat(p)))
-p4
+            main = expression(paste(hat(p), ' Accuracy by Treatment Order and Condition')), 
+            xlab = "Treatment Order", ylab = expression(hat(p)))
+p4 + theme(plot.title = element_text(size = rel(1.5))) + 
+    theme(axis.title.y = element_text(size = rel(1.5))) + 
+    theme(axis.title.x = element_text(size = rel(1.5))) + 
+    theme(legend.text = element_text(size = rel(1.5))) + 
+    theme(legend.title = element_text(size = rel(1.5))) +
+    theme(axis.text = element_text(size = rel(1.5)))
 
 #df to call specific fixed effects in the text
 coeff <- round(summary(mymod)$coeff, digits=2)
@@ -988,7 +1008,7 @@ rand[4:5] <- round(rand[4:5], digits=2)
 
 The effect sizes discussed in the preceding sections reflect participants' long-term or generalization gains in response to treatment. However, recall that some participants made short-term gains that were evident on post-test probes during treatment, but which were not sustained into the midpoint or maintenance phases (see, e.g., Figure 3). To take these gains into consideration, the logistic mixed model was fitted over all data points from pre- and post-treatment probes elicited during the two phases of treatment. For this analysis, we used an uncollapsed data set in which each data point was a single listener's rating of a single token. The binary rating (correct/incorrect) served as the dependent variable. Random intercepts were included to reflect the fact that data points were nested within subjects, items, and raters. Fixed effects including treatment condition (biofeedback versus traditional) and order of treatment delivery (biofeedback-first versus traditional-first) were examined.\footnote{A model with a fixed effect of raw phase order, i.e. phase 1 versus phase 2, did not converge when random by-subject slopes were included. Because the inclusion of random slopes is interpretively important (Barr, Levy, Scheepers, & Tily, 2013), the model with order of treatment delivery was favored over the model using raw phase order.} Model selection was performed using likelihood ratio tests, and only those effects and interactions that yielded a significant difference in likelihood relative to a reduced model were retained. The final model included the interaction between treatment condition and order of treatment delivery, as well as a by-subject random slope for the effect of treatment condition. 
    
-In the logistic mixed model described above, treatment condition (TRAD versus BF) was not a significant predictor of rhotic production accuracy (*$\beta$* = `r coeff[2,1]`, *SE* = `r coeff[2,2]`, , *p* = `r coeff[2,4]`), nor was order of treatment delivery (*$\beta$* = `r coeff[3,1]`, *SE* = `r coeff[3,2]`, , *p* = `r coeff[3,4]`). However, the interaction between treatment type and treatment order was significant (*$\beta$* = `r coeff[4,1]`, *SE* = `r coeff[4,2]`, *p* = `r coeff[4,4]`). This interaction can be visualized in Figure 7, which plots accuracy in within-treatment probes (pre- and post-probes) during both biofeedback and traditional treatment conditions; they are pooled across subjects but partitioned by the order of treatment application (BF-first or TRAD-first). Figure 7 shows that the overall highest accuracy was observed during a phase of traditional treatment that came after a phase of biofeedback treatment. The second-highest accuracy was observed in an initial phase of biofeedback treatment. (Figure 7 shows that accuracy scores tended to be higher in the BF-first order than the TRAD-first order, although this effect was not significant.)  Complete regression results are reported in On-line Supplement A. 
+In the logistic mixed model described above, treatment condition (TRAD versus BF) was not a significant predictor of rhotic production accuracy (*$\beta$* = `r formatC(coeff[2,1], format='f', digits=2)`, *SE* = `r coeff[2,2]`, *p* = `r coeff[2,4]`), nor was order of treatment delivery (*$\beta$* = `r coeff[3,1]`, *SE* = `r coeff[3,2]`, *p* = `r coeff[3,4]`). However, the interaction between treatment type and treatment order was significant (*$\beta$* = `r coeff[4,1]`, *SE* = `r formatC(coeff[4,2], format='f', digits=2)`, *p* = `r coeff[4,4]`). This interaction can be visualized in Figure 7, which plots accuracy in within-treatment probes (pre- and post-probes) during both biofeedback and traditional treatment conditions; they are pooled across subjects but partitioned by the order of treatment application (BF-first or TRAD-first). Figure 7 shows that the overall highest accuracy was observed during a phase of traditional treatment that came after a phase of biofeedback treatment. The second-highest accuracy was observed in an initial phase of biofeedback treatment. (Figure 7 shows that accuracy scores tended to be higher in the BF-first order than the TRAD-first order, although this effect was not significant.)  Complete regression results are reported in On-line Supplement A. 
 
 #Effect size correlations
 
