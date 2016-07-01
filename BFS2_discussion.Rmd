@@ -1,0 +1,332 @@
+---
+title: "Untitled"
+author: "Tara McAllister Byun"
+date: "June 30, 2016"
+output: html_document
+---
+
+```{r, echo=FALSE, include=FALSE, message=FALSE, warning=FALSE}
+########################################
+#LOAD PACKAGES
+########################################
+rm(list=ls())
+library(plotrix)
+library(plyr)
+library(fields)
+library(reshape2)
+library(lme4)
+library(ggplot2)
+library(plyr)
+library(dplyr)
+library(car)
+library(gridExtra)
+library(ppcor)
+library(SCRT)
+library(httpuv)  
+library(caTools)
+library(magrittr)
+library(tidyr)
+```
+
+#Discussion
+
+##Overall Response to Treatment
+
+```{r, echo=FALSE, fig.width=7, fig.height=2,message=FALSE, warning=FALSE}
+#################################################################
+#GET EFFECT SIZES
+#################################################################
+data <- read.csv("clean_data.csv")
+
+#Check that variables are of correct types
+#str(data)
+data$subject_number <- as.factor(data$subject_number)
+#Need to re-set ordered factors
+data$session = ordered(data$session, levels = c("BL1","BL2","BL3","BL4","BL5",
+        "TX1","TX2","TX3","TX4","TX5","TX6","TX7","TX8","TX9","TX10","MP1","MP2","MP3",
+        "TX11","TX12","TX13","TX14","TX15","TX16","TX17","TX18","TX19","TX20","MN1","MN2","MN3"))   
+
+#This code creates an option to examine only the primary probe words 
+#and exclude less frequently occurring generalization items
+#Note how these categories are defined: primary means probed in BLMN and PREPOST,
+#"generalization" means probed in BLMN only. 
+#All are untreated (i.e. not words used as targets during treatment)
+#Determine which words are BLMN only and which are shared BLMN/PREPOST
+  #  length(levels(data$word))
+   tab2 = as.data.frame(plyr::count(data,"word"))
+    #plot(tab2$freq)
+    #items occurring over 300 times are shared BLMN/PREPOST
+    #and the items occurring under 200 times are BLMN only
+    both <- droplevels(tab2[which(tab2$freq>300),])
+    primary <- levels(both$word)
+    only <- droplevels(tab2[which(tab2$freq<200),])
+    generalization <- levels(only$word)
+
+#Option to reduce to only primary words
+#You can ignore it if you are including all words
+    primarywords <- droplevels(data[which(data$word%in%primary),])
+  #  head(primarywords)
+  #  levels(primarywords$word)
+    primarywords$word_type <- "primary"
+    generalizationwords <- droplevels(data[which(data$word%in%generalization),])
+  #  head(generalizationwords)
+  #  levels(generalizationwords$word)
+    generalizationwords$word_type <- "generalization"
+    #Only uncomment this if you want to exclude generalization words
+    #data <- primarywords
+
+#Calculate average n of tokens per session
+#str(data)
+#levels(data$session)
+
+tab = plyr::count(data, c("subject","session","prepost"))
+#tab <- as.data.frame(tab)
+BLMN <- tab[which(tab$prepost=="PROBE"),]
+PREPOST <- tab[which(tab$prepost!="PROBE"),]
+mBLMN <- mean(BLMN$freq)
+sdBLMN <- sd(BLMN$freq)
+mPREPOST <- mean(PREPOST$freq)
+sdPREPOST <- sd(PREPOST$freq)
+
+tx1 <- data
+#str(tx1)
+Children <- levels(tx1$subject)
+
+#True baseline points
+#For each child, calculate the percent of "yes" votes out of total votes in each session
+#And average across sessions
+bl1 <- droplevels(subset(tx1, sessiontype=="BL"))
+nbl <- c()
+bl1_sum <- c()
+bl1_total <- c()
+bl1_perc <- c()
+blall_perc <- c()  ; blall_names <- c() ; blall_sd <- c()   #add these one for BL stabilility measures
+bl1_m <- c()
+bl1_sd <-c()
+for (i in seq_along(Children)){
+  child <- droplevels(subset(bl1, subject==Children[i],))
+  nbl[i] <- length(levels(child$session))
+  bl1_sum <- tapply(child$correct, child$session, sum, na.rm=TRUE)
+  bl1_total <- tapply(child$total, child$session, sum, na.rm=TRUE)
+  bl1_perc <- bl1_sum*100/bl1_total
+  blall_perc <- c(blall_perc, bl1_perc)   #add this one for BL stabilility measures
+  blall_names <- c(blall_names, rep(Children[i], each= nbl[i]))  
+  bl1_m[i] <- mean(bl1_perc)
+  bl1_sd[i] <- sd(bl1_perc)
+  blall_sd <- c(blall_sd, rep(bl1_sd[i], each= nbl[i]))  
+}
+
+#Midpoints
+#For each child, calculate the percent of "yes" votes out of total votes in each session
+#And average across sessions
+mp1 <- droplevels(subset(tx1, sessiontype=="MP"))
+nmp <- c()
+mp1_sum <- c()
+mp1_total <- c()
+mp1_perc <- c()
+mp1_m <- c()
+mp1_sd <-c()
+for (i in seq_along(Children)){
+  child <- droplevels(subset(mp1, subject==Children[i],))
+  nmp[i] <- length(levels(child$session))
+  mp1_sum <- tapply(child$correct, child$session, sum, na.rm=TRUE)
+  mp1_total <- tapply(child$total, child$session, sum, na.rm=TRUE)
+  mp1_perc <- mp1_sum*100/mp1_total
+  mp1_m[i] <- mean(mp1_perc)
+  mp1_sd[i] <- sd(mp1_perc)
+}
+
+#True maintenance points
+mn1 <- subset(tx1, sessiontype=="MN")
+nmn <- c()
+mn1_sum <- c()
+mn1_total <- c()
+mn1_perc <- c()
+mn1_m <- c()
+mn1_sd <-c()
+for (i in seq_along(Children)){
+  child <- droplevels(subset(mn1, subject==Children[i],))
+  nmn[i] <- length(levels(child$session))
+  mn1_sum <- tapply(child$correct, child$session, sum, na.rm=TRUE)
+  mn1_total <- tapply(child$total, child$session, sum, na.rm=TRUE)
+  mn1_perc <- mn1_sum*100/mn1_total
+  mn1_m[i] <- mean(mn1_perc)
+  mn1_sd[i] <- sd(mn1_perc)
+}
+
+#Effect size 1: BL to MP
+#Calculate SD pooled across baseline and MP phases
+pooled1a <- sqrt(((nbl-1)*(bl1_sd^2) + (nmp-1)*(mp1_sd^2))/(nbl+nmp-2))
+    #Alternative using magrittr syntax
+    pooled1 <- ((nbl-1)*(bl1_sd^2)) %>%
+      add((nmp-1)*(mp1_sd^2)) %>%
+      divide_by(nbl+nmp-2) %>%
+      raise_to_power(1/2)
+    #Check that they yield the same output
+    #pooled1a==pooled1
+#Effect size = mean level difference divided by pooled SD
+ESPhase1 <- (mp1_m - bl1_m)/pooled1
+
+#Effect size 2: MP to MN
+#Calculate SD pooled across MP and MN phases
+pooled2a <- sqrt(((nmp-1)*(mp1_sd^2) + (nmn-1)*(mn1_sd^2))/(nmp+nmn-2))
+    #Alternative using magrittr syntax
+    pooled2 <- ((nmp-1)*(mp1_sd^2)) %>%
+      add((nmn-1)*(mn1_sd^2)) %>%
+      divide_by(nmp+nmn-2) %>%
+      raise_to_power(1/2)
+    #Check that they yield the same output
+    #pooled2a==pooled2
+#Effect size = mean level difference divided by pooled SD
+ESPhase2 <- (mn1_m - mp1_m)/pooled2
+
+#Effect size 3: BL to MN
+#Calculate SD pooled across baseline and MN phases
+pooled3a <- sqrt(((nbl-1)*(bl1_sd^2) + (nmn-1)*(mn1_sd^2))/(nbl+nmn-2))
+    #Alternative using magrittr syntax
+    pooled3 <- ((nbl-1)*(bl1_sd^2)) %>%
+      add((nmn-1)*(mn1_sd^2)) %>%
+      divide_by(nbl+nmn-2) %>%
+      raise_to_power(1/2)
+    #Check that they yield the same output
+    #pooled3a==pooled3
+#Effect size = mean level difference divided by pooled SD
+ESall <- (mn1_m - bl1_m)/pooled3
+
+bl1_m <- round(bl1_m, digits=2)
+bl1_sd <- round(bl1_sd, digits=2)
+mp1_m <- round(mp1_m, digits=2)
+mp1_sd <- round(mp1_sd, digits=2)
+mn1_m <- round(mn1_m, digits=2)
+mn1_sd <- round(mn1_sd, digits=2)
+pooled1 <- round(pooled1, digits=2)
+ESPhase1 <- round(ESPhase1, digits=2)
+pooled2 <- round(pooled2, digits=2)
+ESPhase2 <- round(ESPhase2, digits=2)
+pooled3 <- round(pooled3, digits=2)
+ESall <- round(ESall, digits=2)
+
+data1 <- data.frame(Children, bl1_m, bl1_sd,mp1_m, mp1_sd, mn1_m, mn1_sd, pooled1, ESPhase1, pooled2, ESPhase2, pooled3, ESall)
+colnames(data1)[1] <- "subject" 
+#str(data1)
+
+#Add demographic info
+demog  = read.csv("BFS2_demog.csv", header=T)
+demog$subject <- as.factor(demog$subject)
+data2 <- left_join(data1, demog, by="subject")
+data2$subject <- as.factor(data2$subject)
+#str(data2)
+
+#change psuedonyms to pseudo-pseudonyms
+data2$originalpseudonym <- data2$subject
+data2$subject <- mapvalues(data2$originalpseudonym, from = c("Adrian", "Brooklyn", "Connor", "Emily", 
+                                                           "Emma", "Gabriel",  "Hailey", "Hannah", 
+                                                           "Jack", "Liam", "Madison"), 
+                          to = c("Aiden", "Bryce", "Cooper", "Erica", 
+                                 "Ella", "Gregory",  "Holly", "Harper", 
+                                 "Jason", "Landon", "Mason"))
+
+
+#Code by treatment type
+TRAD1 <- droplevels(subset(data2, tx_order=="TRAD_BF"))
+TRAD1$ES_TRAD <- TRAD1$ESPhase1
+TRAD1$ES_BF <- TRAD1$ESPhase2
+
+BF1 <- droplevels(subset(data2, tx_order=="BF_TRAD"))
+BF1$ES_TRAD <- BF1$ESPhase2
+BF1$ES_BF <- BF1$ESPhase1
+
+data3 <- rbind(TRAD1, BF1) 
+data3short <- data3[,1:13]
+data3short$pooled1 <- NULL
+data3short$pooled2 <- NULL
+data3short$pooled3 <- NULL
+
+#Diff in effect size between BF and TRAD conditions
+#Putting BF first because hypothesized to have larger effect
+data3$BF_advantage <- data3$ES_BF - data3$ES_TRAD
+
+#Diff in effect size between first and second phases
+#Putting Phase 2 first because hypothesized to show cumulative effect
+data3$order_effect <- data3$ESPhase2 - data3$ESPhase1
+
+######################################################
+```
+
+This study aimed to identify the differential contribution of visual-acoustic biofeedback versus traditional treatment in a two-phase intervention package for children with residual errors affecting rhotic production. However, we begin our discussion by addressing a more basic question: did participants show evidence of a response to either phase of treatment, or to the combined treatment package? Based on a combination of visual inspection and calculation of effect sizes, we conclude that seven out of eleven participants showed evidence of a meaningful response to at least one type of treatment. Of these seven, four were judged to show strong visual evidence of an intervention effect, with moderate to large overall effect sizes. Three were judged to show moderate visual evidence of an effect, with small to moderate effect sizes. Finally, four participants showed no evidence of a response to either type of treatment. Below we will return to the question of what individual participant characteristics might differentiate responders from non-responders. For now, however, we take up the question of whether the present results support the hypothesis that biofeedback treatment can be more effective than traditional treatment in the remediation of residual rhotic errors.
+
+```{r, eval=TRUE, echo=FALSE, fig.width=7, fig.height=2.5,message=FALSE, warning=FALSE}
+#############################################################
+#CHECK EQUALITY OF GROUPS
+#############################################################
+#Is there a significant difference in baseline accuracy between participants allocated to trad-first
+#versus BF-first? 
+ESdata <- data3
+#str(ESdata)
+tradfirst <- droplevels(subset(ESdata, tx_order=="TRAD_BF"))
+BFfirst <- droplevels(subset(ESdata, tx_order=="BF_TRAD"))
+t1 <- t.test(tradfirst$bl1_m, BFfirst$bl1_m)
+t2 <- t.test(tradfirst$age_months, BFfirst$age_months)
+t3 <- t.test(tradfirst$years_tx_rhotics, BFfirst$years_tx_rhotics)
+
+```
+
+##Differential Response to Traditional versus Biofeedback Treatment
+
+Visual inspection of individual participant results yielded no conclusive evidence of a difference between biofeedback and traditional conditions. There were instances of participants who responded to traditional but not biofeedback treatment (Aiden, Jason), participants who responded to biofeedback but not traditional treatment (Erica, Ella), and participants who responded to both types or neither type. The effect sizes observed in connection with biofeedback treatment phases did not differ significantly from the effect sizes observed for traditional treatment phases, and the mixed logistic model yielded no main effect of treatment condition (traditional versus biofeedback). On the other hand, the mixed logistic model did show a significant interaction between treatment condition and the order in which treatments were administered. An initial phase of biofeedback treatment was associated with a high level of performance, and traditional treatment phases that occurred following a biofeedback treatment phase were associated with the highest accuracy of all. The lowest level of accuracy was observed in initial traditional treatment phases, with only a small increase in the subsequent biofeedback treatment phases. 
+
+One possible interpretation is that this interaction was a chance occurrence. Given the small number of participants, it is possible that the random allocation of participants to treatment orders happened to allocate a disproportionate number of highly treatment-resistant participants to the traditional-first condition. On the other hand, the group of individuals randomly allocated to the biofeedback-first condition did not differ significantly from the traditional-first group with respect to baseline accuracy (*t* = `r round(t1$statistic, digits=2)`, *p* = `r round(t1$p.value, digits=2)`), age (*t* = `r round(t2$statistic, digits=2)`, *p* = `r round(t2$p.value, digits=2)`), or duration of previous treatment (*t* = `r round(t3$statistic, digits=2)`, *p* = `r round(t3$p.value, digits=2)`). Furthermore, the suggestion that any advantage for biofeedback over traditional treatment may be specific to the early stages of treatment is very much in keeping with one theoretical model of how biofeedback might have its effect. As discussed in the introduction, biofeedback provides a detailed form of knowledge of performance (KP) feedback. As such, it is hypothesized to be most advantageous in the earliest stages of learning, when the target motor routine is still being established. However, for motor skills to generalize to other contexts, the learner must be able to evaluate his/her own accuracy without depending on detailed KP feedback. For this reason, it has been argued that KP feedback becomes ineffective or even detrimental in later stages of motor learning (Hodges & Franks, 2001). 
+A logical follow-up to the present experiment would be a similar study in which participants are randomly assigned to receive a phase of biofeedback treatment followed by traditional treatment, or to receive exclusively traditional treatment for the same total duration. If the follow-up were to support the present study in finding a facilitative effect of an initial period of biofeedback treatment, subsequent manipulations should investigate what duration of biofeedback treatment is optimal to provide prior to the transition to traditional treatment. After all, the present study incorporated adaptive changes in treatment difficulty that were specifically designed to avoid excessive dependence on external feedback. The first adjustment in difficulty, which took effect as soon as a participant was judged to produce perceptually accurate rhotics in at least 8/10 consecutive trials, took the form of a reduction from 100% to 50% frequency of external feedback. It is possible that an earlier reduction in feedback frequency would have been more facilitative, or that biofeedback practice should be limited in order to avoid excessive dependence. 
+
+One important modification to incorporate into future research is an increase in dose frequency (number of trials elicited per session). The present dose frequency of 60 trials per session was determined based on previous biofeedback research (e.g., McAllister Byun & Hitchcock, 2012; McAllister Byun, Hitchcock, & Swartz, 2014). However, participants in those studies were as young as 6;0, while all participants in the present study were 9;0 or older. Older participants are capable of producing a larger number of trials per session, and this could be expected to yield higher effect sizes (e.g., Edeal & Gildersleeve-Neumann, 2011). 
+
+```{r, echo=FALSE, fig.width=7, fig.height=2.5,message=FALSE, warning=FALSE}
+#############################################################
+#CORRELATIONS BETWEEN ES AND INDIVIDUAL SUBJECT PROPERTIES
+#############################################################
+#Option to run these without Madison, who is an outlier
+#hist(data$ESall)
+#data <- droplevels(data[data$ESall<20,])
+
+#Correlation between ES~All~ and age
+p5 <- qplot(data=ESdata, x=age_months, y=ESall, geom="point")
+CorAgeAll <- cor.test(ESdata$age_months, ESdata$ESall, type="spearman")
+#NS
+
+#Correlation between ES~All~ and baseline accuracy (participants who start out more accurate tend to gain more?)
+p6 <- qplot(data=ESdata, x=bl1_m, y=ESall, geom="point")
+CorBLAll <- cor.test(ESdata$bl1_m, ESdata$ESall, type="spearman")
+#NS
+
+#Correlation between ES~All~ and perceptual acuity?
+p7 <- qplot(data=ESdata, x=ACUITY_F_PRE, y=ESall, geom="point")
+CorPercAll <- cor.test(ESdata$ACUITY_F_PRE, ESdata$ESall, type="spearman")
+#NS
+
+#Correlation between BF_advantage and perceptual acuity?
+p8 <- qplot(data=ESdata, x=ACUITY_F_PRE, y=BF_advantage, geom="point")
+CorPercBFA <- cor.test(ESdata$ACUITY_F_PRE, ESdata$ESall, type="spearman")
+#NS
+
+#Correlation between ES_all and previous treatment targeting rhotics?
+#str(ESdata)
+p9 <- qplot(data=ESdata, x=years_tx_rhotics, y=ESall, geom="point")
+CorPrevTXAll <- cor.test(ESdata$years_tx_rhotics, ESdata$ESall, type="spearman")
+#NS
+
+```
+
+##Individual Predictors of Response to Treatment
+
+Participants in the present study varied widely in their responses to treatment, including several participants who showed no significant response to either type of treatment. This is consistent with many previous studies of biofeedback intervention, where it is typical to find a diverse range of individual responses to treatment, including non-responders (e.g., McAllister Byun et al., 2014; Preston et al., 2014). This suggests that some individuals may be better suited to benefit from biofeedback intervention than others. However, previous research has not succeeded in identifying individual characteristics that reliably indicate which candidates are most likely to demonstrate a successful response to biofeedback treatment. Unfortunately, the present study is no exception: there were no significant relationships between overall effect size and demographic variables including age (rho = `r round(CorAgeAll$estimate, digits=2)`, *p* = `r round(CorAgeAll$p.value, digits=2)`), duration of previous treatment targeting rhotics (rho = `r round(CorPrevTXAll$estimate, digits=2)`, *p* = `r round(CorPrevTXAll$p.value, digits=2)`), or accuracy in the baseline phase (rho = `r round(CorBLAll$estimate, digits=2)`, *p* = `r round(CorBLAll$p.value, digits=2)`). The non-significance of this last correlation was somewhat surprising; visual inspection of Figures 2-4 suggests that the participants who exhibited the strongest response to treatment were judged by naive listeners to produce rhotics with moderate accuracy in the baseline period, while participants who showed no response to treatment were mostly judged to exhibit near-zero accuracy across the baseline phase. It is possible that a significant correlation between baseline accuracy and treatment response would emerge in a larger sample of participants. In general, it is clear that larger-scale research, including correlational studies that aggregate data over multiple smaller treatment studies, will be necessary to identify factors that can predict the likelihood that a given individual with residual rhotic errors will respond to treatment. 
+
+```{r, echo=FALSE, fig.width=7, fig.height=2.5,message=FALSE, warning=FALSE}
+#############################################################
+#TO ADD LATER
+#Discuss within-session gains versus generalization gains. Are these results consistent with the theoretically motivated claim that biofeedback should enhance initial acquisition of a target, while traditional treatment should promote generalization? May need to leave this for a subsequent paper. Comment on generalization and dose.
+
+#Are we measuring generalization or acquisition? 
+
+#Compare interaction found in mixed model versus interaction in effect size data depicted in Figure 5. Effect sizes and the mixed model provide complementary information: the effect size data provide information about generalization gains from the beginning to end of a phase of treatment, whereas the mixed model was based on data from generalization probes administered within treatment, which potentially reflect a slightly shorter-term form of learning. 
+
+```
