@@ -1,7 +1,7 @@
 ---
 title: "Frontiers paper"
 author: "Tara McAllister Byun and Heather Campbell"
-date: "June 27, 2016"
+date: "July 1, 2016"
 output: html_document
 ---
 ```{r, echo=FALSE, include=FALSE, message=FALSE, warning=FALSE}
@@ -27,7 +27,7 @@ library(magrittr)
 library(tidyr)
 ```
 
-```{r, echo=FALSE, include=FALSE, message=FALSE, warning=FALSE}
+```{r, echo=FALSE, eval= FALSE, include=FALSE, message=FALSE, warning=FALSE}
 ################################################################
 #WARNING!!!!!   THIS CODE LOADS AND CLEANS DATA 
 ###Warning!! This code is currently not active because it's not writing a version of new clean data!!!!!!
@@ -887,16 +887,48 @@ ESdata <- data3
 #Is there a condition effect? Boxplot depicting BF phase across participants, boxplot depicting TRAD phase across participants
 phasedata <- gather(ESdata,Type, ES, c(ES_TRAD, ES_BF))
 #head(phasedata)
-p1 <- qplot(data=phasedata, x=Type, y=ES, geom="boxplot", main = "Insert Title")
+
+phasedata$Condition <- mapvalues(phasedata$Type, from = c("ES_TRAD", "ES_BF"), 
+                          to = c("Traditional", "Biofeedback")) 
+
+p1 <- qplot(data=phasedata, x=Condition, y=ES, fill = Condition, geom="boxplot",
+            main = "(A) Effect Sizes by Treatment Type") +
+            scale_fill_manual(values = c("lightcoral", "cyan3")) + 
+            labs(x = "Treatment Type", y = "Effect Size")
+          
+            
 #boxplot(phasedata$BF_advantage)
+p1 <- p1 + theme(plot.title = element_text(size = rel(1.5))) + 
+      theme(axis.title.y = element_text(size = rel(1.5))) + 
+      theme(axis.title.x = element_text(size = rel(1.5))) +
+      theme(axis.text = element_text(size = rel(1.5))) + 
+      theme(legend.text = element_text(size = rel(1.5))) + 
+      theme(legend.title = element_text(size = rel(1.5))) + 
+      theme(legend.position="none")
 
 #Is there an order effect? Boxplot depicting ES~Phase1~ across participants, boxplot depicting ES~Phase2~ across participants
 #boxplot depicting difference between ES~Phase1~ and ES~Phase2~ across participants.
 orderdata <- gather(ESdata,tx_Order, ES, c(ESPhase1, ESPhase2))
 #head(phasedata)
 
-p2 <- qplot(data=orderdata, x=tx_Order, y=ES, geom="boxplot", main = "Insert Title")
+orderdata$Order <- mapvalues(orderdata$tx_Order, from = c("ESPhase1", "ESPhase2"), 
+                          to = c("Phase 1", "Phase 2")) 
+orderdata$tx_Order_plot <- mapvalues(orderdata$tx_Order, from = c("ESPhase1", "ESPhase2"), 
+                          to = c("Phase 1", "Phase 2")) 
+
+p2 <- qplot(data=orderdata, x=tx_Order_plot, y=ES, fill= tx_Order_plot, geom="boxplot", 
+            main = "(B) Effect Sizes by Phase Order") +
+            scale_fill_manual(values = c("lightcoral", "cyan3")) + 
+            labs(x = "Treatment Order", y = "Effect Size")
 #boxplot(phasedata$order_effect)
+
+p2 <- p2 + theme(plot.title = element_text(size = rel(1.5))) + 
+      theme(axis.title.y = element_text(size = rel(1.5))) + 
+      theme(axis.title.x = element_text(size = rel(1.5))) +
+      theme(axis.text = element_text(size = rel(1.5))) + 
+      theme(legend.text = element_text(size = rel(1.5))) + 
+      theme(legend.title = element_text(size = rel(1.5))) + 
+      theme(legend.position="none")
 
 both <- gather(ESdata, tx_Order, ES, c(ESPhase1, ESPhase2))
 #head(phasedata)
