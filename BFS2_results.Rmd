@@ -926,14 +926,14 @@ both <- gather(ESdata, tx_Order, ES, c(ESPhase1, ESPhase2))
 
 phasedata$tx_order_plot <- mapvalues(phasedata$tx_order, from = c("BF_TRAD", "TRAD_BF"), 
                           to = c("BF-first", "Traditional-first"))
-#phasedata$Condition <- mapvalues(phasedata$Type, from = c("ES_BF", "ES_TRAD"), 
-                                     to = c("Biofeedback", "Traditional"))
 
 #phasedata <- phasedata[order(phasedata$tx_order_plot, decreasing = TRUE), ]
 phasedata$tx_order_plot = ordered(phasedata$tx_order_plot, levels = c("BF-first","Traditional-first"))
 
 p3 <- qplot(data = phasedata, x = tx_order_plot, y = ES, fill = Condition, geom = "boxplot",
-            main = "Effect Sizes by Condition and Treatment Order", xlab = "Treatment Order", ylab = "Effect Size")
+            main = "Effect Sizes by Condition and Treatment Order", 
+            xlab = "Treatment Order", ylab = "Effect Size") +
+            scale_fill_manual(values = c("lightcoral", "cyan3"))
 
 #boxplot(phasedata$order_effect)
 ```
@@ -1013,7 +1013,8 @@ sumdataTX$Condition <- mapvalues(sumdataTX$condition, from = c("BF", "Trad"),
 
 p4 <- qplot(x = tx_order_plot, y = phat, fill = Condition, data = sumdataTX, geom = "boxplot", 
             main = expression(paste(hat(p), ' Accuracy by Treatment Order and Condition')), 
-            xlab = "Treatment Order", ylab = expression(hat(p)))
+            xlab = "Treatment Order", ylab = expression(hat(p))) +
+            scale_fill_manual(values = c("lightcoral", "cyan3"))
 p4 + theme(plot.title = element_text(size = rel(1.5))) + 
     theme(axis.title.y = element_text(size = rel(1.5))) + 
     theme(axis.title.x = element_text(size = rel(1.5))) + 
