@@ -899,7 +899,6 @@ p1 <- p1 + theme(plot.title = element_text(size = rel(1.5))) +
     theme(axis.title.y = element_text(size = rel(1.5))) + 
     theme(axis.title.x = element_text(size = rel(1.5))) +
     theme(axis.text = element_text(size = rel(1.5)))
-p1
 
 #Is there an order effect? Boxplot depicting ES~Phase1~ across participants, boxplot depicting ES~Phase2~ across participants
 #boxplot depicting difference between ES~Phase1~ and ES~Phase2~ across participants.
@@ -919,7 +918,6 @@ p2 <- p2 + theme(plot.title = element_text(size = rel(1.5))) +
     theme(axis.title.y = element_text(size = rel(1.5))) + 
     theme(axis.title.x = element_text(size = rel(1.5))) +
     theme(axis.text = element_text(size = rel(1.5)))
-p2
 
 both <- gather(ESdata, tx_Order, ES, c(ESPhase1, ESPhase2))
 #head(phasedata)
