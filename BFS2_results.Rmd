@@ -955,7 +955,7 @@ grid.arrange(p1, p2, ncol=2)
 
 **Figure 5. Boxplots depicting the distribution of effect sizes observed in connection with (A) biofeedback versus traditional treatment, independent of phase order; (B) phase 1 versus phase 2 of treatment, independent of treatment type.**
 
-```{r, echo=FALSE, cache=FALSE, message=FALSE, warning=FALSE}
+```{r, echo=FALSE, cache=TRUE, message=FALSE, warning=FALSE}
 p3 + theme(plot.title = element_text(size = rel(1.5))) + 
     theme(axis.title.y = element_text(size = rel(1.5))) + 
     theme(axis.title.x = element_text(size = rel(1.5))) + 
@@ -970,7 +970,7 @@ Figure 5a shows that the effect size distributions observed in biofeedback versu
 
 ##Across-subjects comparisons: Mixed logistic model
 
-```{r, echo=FALSE, cache=FALSE, message=FALSE, warning=FALSE}
+```{r, echo=FALSE, cache=TRUE, message=FALSE, warning=FALSE}
 #############################################################
 #LOGISTIC MIXED MODEL
 #############################################################
