@@ -886,65 +886,53 @@ ESdata <- data3
 
 #Is there a condition effect? Boxplot depicting BF phase across participants, boxplot depicting TRAD phase across participants
 phasedata <- gather(ESdata,Type, ES, c(ES_TRAD, ES_BF))
-#head(phasedata)
 
-phasedata$Condition <- mapvalues(phasedata$Type, from = c("ES_TRAD", "ES_BF"), 
-                          to = c("Traditional", "Biofeedback")) 
+phasedata$Condition <- mapvalues(phasedata$Type, from = c("ES_BF", "ES_TRAD"), 
+                                     to = c("Biofeedback", "Traditional"))
 
-p1 <- qplot(data=phasedata, x=Condition, y=ES, fill = Condition, geom="boxplot",
-            main = "(A) Effect Sizes by Treatment Type") +
-            scale_fill_manual(values = c("lightcoral", "cyan3")) + 
-            labs(x = "Treatment Type", y = "Effect Size")
-          
-            
+p1 <- qplot(data=phasedata, x=Condition, y=ES, fill = Condition, geom="boxplot", 
+            main = "(A) Effect Sizes by Treatment Type", 
+            xlab = "Treatment Type", ylab = "Effect Size", show_guide = FALSE) +
+            scale_fill_manual(values = c("lightcoral", "cyan3"))
+
 #boxplot(phasedata$BF_advantage)
 p1 <- p1 + theme(plot.title = element_text(size = rel(1.5))) + 
-      theme(axis.title.y = element_text(size = rel(1.5))) + 
-      theme(axis.title.x = element_text(size = rel(1.5))) +
-      theme(axis.text = element_text(size = rel(1.5))) + 
-      theme(legend.text = element_text(size = rel(1.5))) + 
-      theme(legend.title = element_text(size = rel(1.5))) + 
-      theme(legend.position="none")
+    theme(axis.title.y = element_text(size = rel(1.5))) + 
+    theme(axis.title.x = element_text(size = rel(1.5))) +
+    theme(axis.text = element_text(size = rel(1.5)))
 
 #Is there an order effect? Boxplot depicting ES~Phase1~ across participants, boxplot depicting ES~Phase2~ across participants
 #boxplot depicting difference between ES~Phase1~ and ES~Phase2~ across participants.
 orderdata <- gather(ESdata,tx_Order, ES, c(ESPhase1, ESPhase2))
 #head(phasedata)
 
-orderdata$Order <- mapvalues(orderdata$tx_Order, from = c("ESPhase1", "ESPhase2"), 
-                          to = c("Phase 1", "Phase 2")) 
 orderdata$tx_Order_plot <- mapvalues(orderdata$tx_Order, from = c("ESPhase1", "ESPhase2"), 
-                          to = c("Phase 1", "Phase 2")) 
+                          to = c("Phase 1", "Phase 2"))
 
-p2 <- qplot(data=orderdata, x=tx_Order_plot, y=ES, fill= tx_Order_plot, geom="boxplot", 
-            main = "(B) Effect Sizes by Phase Order") +
-            scale_fill_manual(values = c("lightcoral", "cyan3")) + 
-            labs(x = "Treatment Order", y = "Effect Size")
+p2 <- qplot(data=orderdata, x=tx_Order_plot, y=ES, fill = tx_Order_plot, geom="boxplot", 
+            main = "(B) Effect Sizes by Phase Order",
+            xlab = "Treatment Order", ylab = "Effect Size", show_guide = FALSE) +
+            scale_fill_manual(values = c("lightcoral", "cyan3"))
+
 #boxplot(phasedata$order_effect)
-
 p2 <- p2 + theme(plot.title = element_text(size = rel(1.5))) + 
-      theme(axis.title.y = element_text(size = rel(1.5))) + 
-      theme(axis.title.x = element_text(size = rel(1.5))) +
-      theme(axis.text = element_text(size = rel(1.5))) + 
-      theme(legend.text = element_text(size = rel(1.5))) + 
-      theme(legend.title = element_text(size = rel(1.5))) + 
-      theme(legend.position="none")
+    theme(axis.title.y = element_text(size = rel(1.5))) + 
+    theme(axis.title.x = element_text(size = rel(1.5))) +
+    theme(axis.text = element_text(size = rel(1.5)))
 
 both <- gather(ESdata, tx_Order, ES, c(ESPhase1, ESPhase2))
 #head(phasedata)
 
 phasedata$tx_order_plot <- mapvalues(phasedata$tx_order, from = c("BF_TRAD", "TRAD_BF"), 
                           to = c("BF-first", "Traditional-first"))
-phasedata$Condition <- mapvalues(phasedata$Type, from = c("ES_BF", "ES_TRAD"), 
-                                     to = c("Biofeedback", "Traditional"))
 
 #phasedata <- phasedata[order(phasedata$tx_order_plot, decreasing = TRUE), ]
 phasedata$tx_order_plot = ordered(phasedata$tx_order_plot, levels = c("BF-first","Traditional-first"))
 
 p3 <- qplot(data = phasedata, x = tx_order_plot, y = ES, fill = Condition, geom = "boxplot",
-            main = "Effect Sizes by Condition and Treatment Order", xlab = "Treatment Order", ylab = "Effect Size")
-
-#boxplot(phasedata$order_effect)
+            main = "Effect Sizes by Condition and Treatment Order", 
+            xlab = "Treatment Order", ylab = "Effect Size") +
+            scale_fill_manual(values = c("lightcoral", "cyan3"))
 ```
 
 Although the primary focus of this single-subject experimental study is on within-subject changes, the counterbalanced design makes it possible to explore between-subjects effects as well. The boxplots in Figures 5-6 show the distribution of effect sizes observed when the data are partitioned in different ways. In Figure 5a, effect sizes associated with biofeedback treatment phases (*ES~BF~*) are compared against effect sizes from traditional treatment phases (*ES~Trad~*), independent of the order in which the two types of treatment were delivered. Figure 5b examines a possible order effect, comparing the distribution of *ES~Phase1~* versus *ES~Phase2~*, independent of the type of treatment delivered in each phase. Finally, Figure 6 considers a possible interaction between treatment type and order of treatment delivery: participants are partitioned into those who received biofeedback first versus traditional treatment first, and the distribution of effect sizes observed in each treatment condition is plotted. 
